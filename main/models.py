@@ -35,3 +35,18 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
+
+class Review(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    username = models.CharField(max_length=50)
+    comment = models.TextField(blank=True)
+    stars = models.IntegerField(default=5)
+    recommended = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Автор: {self.username}, товар: "{self.product}"'
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
