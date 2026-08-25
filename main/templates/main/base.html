@@ -1,7 +1,9 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
     <title>{% block title %}Amazon{% endblock %}</title>
 </head>
 <body>
@@ -11,6 +13,8 @@
       <a href="{% url 'index' %}">Главная</a>
       &nbsp;&nbsp;&nbsp;
       <a href="{% url 'about' %}">О магазине</a>
+      &nbsp;&nbsp;&nbsp;
+      <a href="{% url 'review' %}">Отзывы покупателей</a>
     </nav>
 
     {% block content %}{% endblock %}

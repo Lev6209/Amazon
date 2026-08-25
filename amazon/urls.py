@@ -19,10 +19,12 @@ from django.urls import path
 
 from main.views import index
 from main.views import about
+from main.views import review
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', index, name='index'),
     path('about/', about, name='about'),
+    path('review/', review, name='review'),
 ]

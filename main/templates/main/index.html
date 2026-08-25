@@ -4,6 +4,11 @@
 
 {% block content %}
     <h1>Добро пожаловать в наш магазин!</h1>
+    <h2>Самый дорогой продукт дня:</h2>
+    <h3>{{ daily_product.name }}</h3>
+    <p>Цена: {{ daily_product.price }}$</p>
+    <p>Рейтинг: {{ daily_product.rating }}★</p>
+
     <h2>Наши продукты:</h2>
 
     <ul>

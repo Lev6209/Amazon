@@ -1,0 +1,39 @@
+{% extends 'main/base.html' %}
+
+    {% block title %}Отзывы покупателей{% endblock %}
+
+{% block content %}
+
+    <h1>Отзывы покупателей</h1>
+
+
+<ul>
+    {% for review in reviews %}
+        <li>
+            <strong>{{ review.username }}</strong><br>
+            Продукт: {{ review.product.name }}<br>
+            Оценка: {{ review.stars }}<br>
+            Отзыв:
+                {% if review.comment %}
+                    {{ review.comment }}
+                {% else %}
+                    Не был оставлен
+                {% endif %} <br>
+            Рекомендую:
+                {% if review.recommended %}
+                    Да
+                {% else %}
+                    Нет
+                {% endif %}
+            <br><br>
+        </li>
+    {% empty %}
+        <li>Отзывов не найдено</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+
+
+
+
