@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}">На главную</a>
+    <span style="font-size: 36px;">👈&nbsp;</span> <a href="{% url 'index' %}">На главную</a>
 
     <h2>Категория: {{ category.name }}</h2>
 
@@ -15,6 +15,15 @@
                 Цена: {{ expensive.price }} $
         </li>
     {% endif %}
+
+    <br>
+    <br>
+
+    <p>
+        Сортировка:&nbsp;&nbsp;&nbsp;
+        <a href="?sort=price">Сначала дешёвые</a>|&nbsp;&nbsp;&nbsp;
+        <a href="?sort=-price">Сначала дорогие</a>
+    </p>
 
     <ul>
     {% for product in products %}

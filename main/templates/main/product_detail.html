@@ -3,7 +3,23 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-     <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}">На главную</a>
+     <p>
+    <a href="{% url 'index' %}">Главная</a>
+    →
+
+    {% if product.category %}
+        <a href="{% url 'category_detail' product.category.id %}">
+            {{ product.category }}
+        </a>
+        →
+    {% endif %}
+
+    {{ product.name }}
+</p>
+
+    <br>
+    <br>
+    <hr>
 
     <h2>{{ product.name }}</h2>
 
@@ -35,6 +51,29 @@
     <p>Продавец: {{ product.seller }}</p>
 
     <p>Рейтинг: {{ product.rating }} ⭐</p>
+
+    <hr>
+    <h3>Отзывы:</h3>
+
+    {% for review in product.review_set.all %}
+         <li>
+            <div>
+                <p><strong>{{ review.username }}</strong></p>
+                <p>Оценка: {{ review.stars }}</p>
+                <p>Комментарий: {{ review.comment }}</p>
+
+                {% if review.recommended %}
+                    <span style="font-size: 36px;">👍🏼</span><strong> Рекомендует</strong>
+                {% else %}
+                    <span style="font-size: 36px;">👎🏼</span><strong> Не рекомендует</strong>
+                {% endif %}
+            </div>
+        </li>
+        <hr>
+        <p>Всего отзывов: {{ product.review_set.count }}</p>
+    {% empty %}
+        <p>Отзывов пока нет</p>
+    {% endfor %}
 
 
 {% endblock %}
