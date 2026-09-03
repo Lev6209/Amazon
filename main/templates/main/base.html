@@ -7,7 +7,11 @@
     <title>{% block title %}Amazon{% endblock %}</title>
 </head>
 <body>
-    <h1>Amazon</h1>
+
+
+<div class="container">
+    <img src="{% static 'main/logo.png' %}" alt="Amazon">
+</div>
 
     <nav>
       <a href="{% url 'index' %}">Главная</a>

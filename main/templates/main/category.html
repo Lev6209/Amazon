@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ category.name}} - Amazon{% endblock %}
+
+{% block content %}
+
+    <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}">На главную</a>
+
+    <h2>Категория: {{ category.name }}</h2>
+
+    {% if expensive %}
+        <li>
+            <p>Самое дорогое приложение в этой категории:</p>
+                <strong><a href="{% url 'product_detail' expensive.id %}"></a>{{ expensive.name }}</strong> -
+                Цена: {{ expensive.price }} $
+        </li>
+    {% endif %}
+
+    <ul>
+    {% for product in products %}
+        <li>
+            <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> -
+            {% if product.price == 0 %}Бесплатно{% else %}{{ product.price }} ${% endif %}
+        </li>
+    {% empty %}
+        <li>В этой категории приложений пока нет.</li>
+    {% endfor %}
+    </ul>
+
+    <p>Всего в категории {{ products|length }} товаров.</p>
+{% endblock %}

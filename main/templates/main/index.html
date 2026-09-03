@@ -4,16 +4,33 @@
 
 {% block content %}
     <h1>Добро пожаловать в наш магазин!</h1>
-    <h2>Самый дорогой продукт дня:</h2>
-    <h3>{{ daily_product.name }}</h3>
-    <p>Цена: {{ daily_product.price }}$</p>
-    <p>Рейтинг: {{ daily_product.rating }}★</p>
+    <li>
+
+    <h2>Продукт дня:</h2>
+    <strong><a href="{% url 'product_detail' daily_product.id %}">{{ daily_product.name }}</a></strong>
+    ({{ daily_product.category }})<br>
+    Цена: {{ daily_product.price }}$<br>
+    Рейтинг: {{ daily_product.rating }}★
+
+</li>
+
+    <h2>Список категорий:</h2>
+
+    <li>
+        {% for category in categories %}
+            <strong><a href="{% url 'category_detail' category.id %}">{{ category.name }}</a></strong><br>
+
+        {% empty %}
+            <li>Нет доступных категорий</li>
+        {% endfor %}
+    </li>
 
     <h2>Наши продукты:</h2>
 
     <ul>
         {% for product in products %}
-        <li><strong>{{ product.name }}</strong> ({{ product.category }})<br>
+        <li>
+            <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> ({{ product.category }})<br>
 
             {{ product.description|truncatechars:60 }}<br>
 

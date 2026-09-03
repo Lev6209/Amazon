@@ -1,0 +1,40 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+     <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}">На главную</a>
+
+    <h2>{{ product.name }}</h2>
+
+
+    <p>Категория:
+        {% if product.category %}
+             <a href="{% url 'category_detail' product.category.id %}">{{ product.category }}</a>
+        {% else %}
+            Без категории
+        {% endif %}
+    </p>
+
+    <p>
+        {% if product.price == 0 %}
+                <strong>Бесплатно</strong>
+            {% else %}
+                <strong>Цена: {{ product.price }} $</strong>
+            {% endif %}
+    </p>
+
+    {% if product.description %}
+        <p>Описание: {{ product.description }}</p>
+    {% else %}
+        <p>Описание пока не добавлено</p>
+    {% endif %}
+
+    <p>Добавлено: {{ product.created_at|date:"d.m.Y H:i" }}</p>
+
+    <p>Продавец: {{ product.seller }}</p>
+
+    <p>Рейтинг: {{ product.rating }} ⭐</p>
+
+
+{% endblock %}
