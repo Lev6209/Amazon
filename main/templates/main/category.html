@@ -8,6 +8,13 @@
 
     <h2>Категория: {{ category.name }}</h2>
 
+    <form method="GET" action="{% url 'category_detail' category.id %}">
+        <input type="text" name="q" placeholder="Поиск товаров в данной категории" value="{{ q }}">
+        <button type="submit">Найти</button>
+    </form>
+    <br>
+    <br>
+
     {% if expensive %}
         <li>
             <p>Самое дорогое приложение в этой категории:</p>
@@ -26,7 +33,7 @@
     </p>
 
     <ul>
-    {% for product in products %}
+    {% for product in page_obj %}
         <li>
             <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> -
             {% if product.price == 0 %}Бесплатно{% else %}{{ product.price }} ${% endif %}
@@ -35,6 +42,18 @@
         <li>В этой категории приложений пока нет.</li>
     {% endfor %}
     </ul>
+
+    <p>
+        {% if page_obj.has_previous %}
+        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+        {% endif %}
+
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}">Вперёд</a><span style="font-size: 36px;">👉</span>
+        {% endif %}
+    </p>
 
     <p>Всего в категории {{ products|length }} товаров.</p>
 {% endblock %}

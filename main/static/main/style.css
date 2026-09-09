@@ -54,3 +54,21 @@ h1 {
     width: 100%;
     height: auto;
 }
+
+button {
+    width: 75px;
+    background-color: #FF9901;
+    color: #000033;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input {
+    width: 220px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}

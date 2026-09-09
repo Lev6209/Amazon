@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Новинки — Amazon{% endblock %}
+
+{% block content %}
+    <h2>Новинки</h2>
+
+    <ul>
+    {% for product in page_obj %}
+        <li>
+            <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a><br>
+                Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
+            {% if product.price == 0 %}
+                Этот продукт бесплатный
+            {% else %}
+                Цена: {{ product.price }} $
+            {% endif %}
+            <br>
+        </li>
+    {% empty %}
+        <li>Товаров пока нет.</li>
+    {% endfor %}
+    </ul>
+
+    <p>
+        {% if page_obj.has_previous %}
+        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+        {% endif %}
+
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}">Вперёд</a><span style="font-size: 36px;">👉</span>
+        {% endif %}
+    </p>
+
+    <p>Всего товаров: {{ products|length }}</p>
+{% endblock %}

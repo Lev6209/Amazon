@@ -4,21 +4,32 @@
 
 {% block content %}
     <h1>Добро пожаловать в наш магазин!</h1>
+
+    <form method="GET" action="{% url 'index' %}">
+        <input type="text" name="q" placeholder="Поиск товаров" value="{{ q }}">
+        <button type="submit">Найти</button>
+    </form>
+    <br>
+    <br>
+
+
     <li>
-
-    <h2>Продукт дня:</h2>
-    <strong><a href="{% url 'product_detail' daily_product.id %}">{{ daily_product.name }}</a></strong>
-    ({{ daily_product.category }})<br>
-    Цена: {{ daily_product.price }}$<br>
-    Рейтинг: {{ daily_product.rating }}★
-
-</li>
+        <h2>Продукт дня:</h2>
+        <strong><a href="{% url 'product_detail' daily_product.id %}">{{ daily_product.name }}</a></strong>
+            ({{ daily_product.category }})<br>
+            Цена: {{ daily_product.price }}$<br>
+            Рейтинг: {{ daily_product.rating }}★
+    </li>
 
     <h2>Список категорий:</h2>
 
     <li>
         {% for category in categories %}
-            <strong><a href="{% url 'category_detail' category.id %}">{{ category.name }}</a></strong><br>
+            <strong>
+                <a href="{% url 'category_detail' category.id %}">{{ category.name }}</a>
+                ({{ category.product_set.count }}){% if not forloop.last %}, {% endif %}
+            </strong><br>
+
 
         {% empty %}
             <li>Нет доступных категорий</li>
@@ -29,12 +40,14 @@
 
     <p>
         Сортировка:&nbsp;&nbsp;&nbsp;
+        <a href="?sort=new">Новые</a>|&nbsp;&nbsp;
+        <a href="?sort=name">По названию</a>|&nbsp;&nbsp;
         <a href="?sort=price">Сначала дешёвые</a>|&nbsp;&nbsp;&nbsp;
         <a href="?sort=-price">Сначала дорогие</a>
     </p>
 
     <ul>
-        {% for product in products %}
+        {% for product in page_obj %}
         <li>
             <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> ({{ product.category }})<br>
 
@@ -57,4 +70,18 @@
             <li>Нет доступных продуктов</li>
         {% endfor %}
     </ul>
+
+    <p>
+        {% if page_obj.has_previous %}
+        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+        {% endif %}
+
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}">Вперёд</a><span style="font-size: 36px;">👉</span>
+        {% endif %}
+    </p>
+
+    <p>Всего товаров: {{ products | length }}</p>
 {% endblock %}
