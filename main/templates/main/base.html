@@ -14,15 +14,15 @@
 </div>
 
     <nav>
-        <a href="{% url 'index' %}">Главная</a>
+        <a href="{% url 'main:index' %}">Главная</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'about' %}">О магазине</a>
+        <a href="{% url 'main:about' %}">О магазине</a>
 
-        <a href="{% url 'new' %}">Новинки</a>
+        <a href="{% url 'main:new' %}">Новинки</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'review' %}">Отзывы покупателей</a>
+        <a href="{% url 'main:review' %}">Отзывы покупателей</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'free' %}">Бесплатные товары</a>
+        <a href="{% url 'main:free' %}">Бесплатные товары</a>
     </nav>
 
 

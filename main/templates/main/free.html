@@ -3,14 +3,14 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-     <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}">На главную</a>
+     <span style="font-size: 36px;">👈</span> <a href="{% url 'main:index' %}">На главную</a>
 
     <h2>Бесплатные товары</h2>
 
     <ul>
     {% for product in products %}
         <li>
-            <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> –
+            <strong><a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a></strong> –
                 Цена: {{ product.price }} $
             <br>
         </li>

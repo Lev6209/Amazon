@@ -8,7 +8,7 @@
     <ul>
     {% for product in page_obj %}
         <li>
-            <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a><br>
+            <a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a><br>
                 Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
             {% if product.price == 0 %}
                 Этот продукт бесплатный

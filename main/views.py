@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
 
@@ -50,8 +50,13 @@ def index(request):
 def about(request):
     return render(request, 'main/about.html')
 
-def product_detail(request, product_id):
+def product_detail(request, product_id, product_name):
+    print(product_name)
     product = get_object_or_404(Product, id=product_id)
+
+    if product_name != product.name:
+        return redirect('main:product_detail', product.id, product.name)
+
     return render(request, 'main/product_detail.html', {'product': product})
 
 

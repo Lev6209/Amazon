@@ -4,11 +4,11 @@
 
 {% block content %}
      <p>
-    <a href="{% url 'index' %}">Главная</a>
+    <a href="{% url 'main:index' %}">Главная</a>
     →
 
     {% if product.category %}
-        <a href="{% url 'category_detail' product.category.id %}">
+        <a href="{% url 'main:category_detail' product.category.id %}">
             {{ product.category }}
         </a>
         →
@@ -26,7 +26,7 @@
 
     <p>Категория:
         {% if product.category %}
-             <a href="{% url 'category_detail' product.category.id %}">{{ product.category }}</a>
+             <a href="{% url 'main:category_detail' product.category.id %}">{{ product.category }}</a>
         {% else %}
             Без категории
         {% endif %}

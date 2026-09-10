@@ -4,11 +4,11 @@
 
 {% block content %}
 
-    <span style="font-size: 36px;">👈&nbsp;</span> <a href="{% url 'index' %}">На главную</a>
+    <span style="font-size: 36px;">👈&nbsp;</span> <a href="{% url 'main:index' %}">На главную</a>
 
     <h2>Категория: {{ category.name }}</h2>
 
-    <form method="GET" action="{% url 'category_detail' category.id %}">
+    <form method="GET" action="{% url 'main:category_detail' category.id %}">
         <input type="text" name="q" placeholder="Поиск товаров в данной категории" value="{{ q }}">
         <button type="submit">Найти</button>
     </form>
@@ -18,7 +18,7 @@
     {% if expensive %}
         <li>
             <p>Самое дорогое приложение в этой категории:</p>
-                <strong><a href="{% url 'product_detail' expensive.id %}"></a>{{ expensive.name }}</strong> -
+                <strong><a href="{% url 'main:product_detail' expensive.id expensive.name%}"></a>{{ expensive.name }}</strong> -
                 Цена: {{ expensive.price }} $
         </li>
     {% endif %}
@@ -35,7 +35,7 @@
     <ul>
     {% for product in page_obj %}
         <li>
-            <strong><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></strong> -
+            <strong><a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a></strong> -
             {% if product.price == 0 %}Бесплатно{% else %}{{ product.price }} ${% endif %}
         </li>
     {% empty %}

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <span style="font-size: 36px;">👈</span> <a href="{% url 'index' %}"> На главную</a>
+    <span style="font-size: 36px;">👈</span> <a href="{% url 'main:index' %}"> На главную</a>
 
     <h1>Отзывы покупателей</h1>
 
@@ -13,7 +13,7 @@
     {% for review in reviews %}
         <li>
             <strong>{{ review.username }}</strong><br>
-            Продукт: <strong><a href="{% url 'product_detail' review.product.id %}">{{ review.product.name }}</a></strong><br>
+            Продукт: <strong><a href="{% url 'main:product_detail' review.product.id review.product.name%}">{{ review.product.name }}</a></strong><br>
             Оценка: {{ review.stars }}<br>
             Отзыв:
                 {% if review.comment %}
