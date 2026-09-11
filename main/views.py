@@ -41,6 +41,7 @@ def index(request):
 
     return render(request, 'main/index.html', {
         'q': q,
+        'sort': sort,
         'page_obj': page_obj,
         'products': products,
         'daily_product': daily_product,
@@ -51,7 +52,6 @@ def about(request):
     return render(request, 'main/about.html')
 
 def product_detail(request, product_id, product_name):
-    print(product_name)
     product = get_object_or_404(Product, id=product_id)
 
     if product_name != product.name:

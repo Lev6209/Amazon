@@ -12,9 +12,8 @@
     <br>
     <br>
 
-
+    <h2>Продукт дня:</h2>
     <li>
-        <h2>Продукт дня:</h2>
         <strong><a href="{% url 'main:product_detail' daily_product.id daily_product.name%}">{{ daily_product.name }}</a></strong>
             ({{ daily_product.category }})<br>
             Цена: {{ daily_product.price }}$<br>
@@ -73,13 +72,13 @@
 
     <p>
         {% if page_obj.has_previous %}
-        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&sort={{ sort }}">Назад</a>
         {% endif %}
 
         Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
 
         {% if page_obj.has_next %}
-        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}">Вперёд</a><span style="font-size: 36px;">👉</span>
+        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&sort={{ sort }}">Вперёд</a><span style="font-size: 36px;">👉</span>
         {% endif %}
     </p>
 
