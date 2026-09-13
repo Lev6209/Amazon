@@ -17,12 +17,16 @@
         <a href="{% url 'main:index' %}">Главная</a>
         &nbsp;&nbsp;&nbsp;
         <a href="{% url 'main:about' %}">О магазине</a>
-
+        &nbsp;&nbsp;&nbsp;
         <a href="{% url 'main:new' %}">Новинки</a>
         &nbsp;&nbsp;&nbsp;
         <a href="{% url 'main:review' %}">Отзывы покупателей</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:free' %}">Бесплатные товары</a>
+{#        <a href="{% url 'main:free' %}">Бесплатные товары</a>#}
+{#        &nbsp;&nbsp;&nbsp;#}
+        <a href="{% url 'main:free_products' %}">Бесплатные товары</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{% url 'main:paid_products' %}">Платные товары</a>
     </nav>
 
 

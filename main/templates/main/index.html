@@ -35,15 +35,22 @@
         {% endfor %}
     </li>
 
-    <h2>Наши продукты:</h2>
+    <h2>{{ title }}</h2>
 
     <p>
-        Сортировка:&nbsp;&nbsp;&nbsp;
-        <a href="?sort=new">Новые</a>|&nbsp;&nbsp;
-        <a href="?sort=name">По названию</a>|&nbsp;&nbsp;
-        <a href="?sort=price">Сначала дешёвые</a>|&nbsp;&nbsp;&nbsp;
+    Сортировка:
+        &nbsp;&nbsp;&nbsp;
+    <a href="?sort=new">Новые</a>|
+        &nbsp;&nbsp;
+    <a href="?sort=name">По названию</a>
+
+    {% if not is_free %}
+        |&nbsp;&nbsp;
+        <a href="?sort=price">Сначала дешёвые</a>
+        |&nbsp;&nbsp;&nbsp;
         <a href="?sort=-price">Сначала дорогие</a>
-    </p>
+    {% endif %}
+</p>
 
     <ul>
         {% for product in page_obj %}
@@ -70,17 +77,26 @@
         {% endfor %}
     </ul>
 
+    {% if is_paginated %}
     <p>
         {% if page_obj.has_previous %}
-        <span style="font-size: 36px;">👈&nbsp;</span> <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&sort={{ sort }}">Назад</a>
+            <span style="font-size: 36px;">👈&nbsp;</span>
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&sort={{ sort }}">
+                Назад
+            </a>
         {% endif %}
 
         Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
 
         {% if page_obj.has_next %}
-        &nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&sort={{ sort }}">Вперёд</a><span style="font-size: 36px;">👉</span>
+            &nbsp;&nbsp;
+            <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&sort={{ sort }}">
+                Вперёд
+            </a>
+            <span style="font-size: 36px;">👉</span>
         {% endif %}
     </p>
+{% endif %}
 
-    <p>Всего товаров: {{ products | length }}</p>
+    <p>Всего товаров: {{ page_obj.paginator.count }}</p>
 {% endblock %}
