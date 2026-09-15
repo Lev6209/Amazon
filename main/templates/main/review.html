@@ -14,7 +14,7 @@
         <li>
             <strong>{{ review.username }}</strong><br>
             Продукт: <strong><a href="{% url 'main:product_detail' review.product.id review.product.name%}">{{ review.product.name }}</a></strong><br>
-            Оценка: {{ review.stars }}<br>
+            Оценка: {{ review.stars }} ⭐<br>
             Отзыв:
                 {% if review.comment %}
                     {{ review.comment }}
@@ -23,9 +23,9 @@
                 {% endif %} <br>
             Рекомендую:
                 {% if review.recommended %}
-                    Да
+                    Да <span style="font-size: 24px;">👍🏼</span>
                 {% else %}
-                    Нет
+                    Нет <span style="font-size: 24px;">👎🏼</span>
                 {% endif %}
             <br><br>
         </li>

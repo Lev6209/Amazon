@@ -50,17 +50,71 @@
 
     <p>Продавец: {{ product.seller }}</p>
 
-    <p>Рейтинг: {{ product.rating }} ⭐</p>
+    {% if average_rating is not None %}
+        <p>Рейтинг: {{ average_rating|floatformat:1 }} ⭐</p>
+    {% else %}
+        <p>Оценок пока нет</p>
+    {% endif %}
 
     <hr>
-    <h3>Отзывы:</h3>
 
+    <section>
+    <h3>Хотите оставить отзыв?:</h3>
+
+    <form method="post" action="{% url 'main:add_review' product.id %}" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.errors }}
+        </p>
+
+        <p>
+            {{ form.comment.label_tag }}
+            {{ form.comment }}
+            {{ form.comment.errors }}
+        </p>
+
+        <p>
+            {{ form.stars.label_tag }}
+            {{ form.stars }}
+            {{ form.stars.errors }}
+        </p>
+
+        <p>
+            {{ form.recommended.label_tag }}
+            {{ form.recommended }}
+            {{ form.recommended.errors }}
+        </p>
+
+        <button type="submit" style="width: 200px; margin-left: 260px">Добавить отзыв</button>
+        <br><br>
+
+        {% if messages %}
+            {% for message in messages %}
+                <h3><strong style="margin-left: 260px">{{ message }}</strong></h3>
+            {% endfor %}
+        {% endif %}
+        <br><br>
+        <hr>
+    </form>
+
+    </section>
+
+    <h3>Отзывы покупателей:</h3>
     {% for review in product.review_set.all %}
          <li>
             <div>
                 <p><strong>{{ review.username }}</strong></p>
                 <p>Оценка: {{ review.stars }}</p>
-                <p>Комментарий: {{ review.comment }}</p>
+                <span>Комментарий: </span>
+                    {% if review.comment %}
+                            {{ review.comment }}
+                        {% else %}
+                            Не был оставлен
+                        {% endif %} <br>
 
                 {% if review.recommended %}
                     <span style="font-size: 36px;">👍🏼</span><strong> Рекомендует</strong>
@@ -69,11 +123,11 @@
                 {% endif %}
             </div>
         </li>
-        <hr>
-        <p>Всего отзывов: {{ product.review_set.count }}</p>
     {% empty %}
         <p>Отзывов пока нет</p>
     {% endfor %}
 
+    <hr>
+    <p>Всего отзывов: {{ product.review_set.count }}</p>
 
 {% endblock %}

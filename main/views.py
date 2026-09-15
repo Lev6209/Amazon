@@ -1,14 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.core.paginator import Paginator
 from django.views import View
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView
+from django.contrib import messages
 
 from .models import Product
 from .models import Review
 from .models import Category
+
+from .forms import ReviewForm
 
 SORTS = {
         'price': 'price',
@@ -83,6 +86,11 @@ class IndexView(ListView):
         else:
             products = Product.objects.all()
 
+        products = products.annotate(
+            average_rating=Avg('review__stars')
+        )
+
+
         if q:
             products = products.filter(
                 Q(name__icontains=q) |
@@ -148,18 +156,50 @@ class ProductDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-
         product_name = self.kwargs.get('product_name')
+        product = self.object
 
-        if product_name != self.object.name:
+        if product_name != product.name:
             return redirect(
                 'main:product_detail',
-                self.object.id,
-                self.object.name
+                product.id,
+                product.name
             )
 
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['form'] = ReviewForm()
+        context['reviews'] = self.object.review_set.order_by('-created_at')
+
+        average_rating = Review.objects.filter(
+            product=self.object
+        ).aggregate(Avg('stars'))['stars__avg']
+
+        context['average_rating'] = average_rating
+
+        return context
+
+
+@require_POST
+def add_review(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    form = ReviewForm(request.POST)
+
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.product = product
+        review.save()
+
+        messages.success(request, 'Спасибо, ваш отзыв добавлен!')
+
+        return redirect('main:product_detail', product.id, product.name)
+
+    reviews = product.review_set.order_by('-created_at')
+
+    return render(request, 'main/product_detail.html', {'product': product, 'form': form, 'reviews': reviews})
 
 
 @require_GET
@@ -194,7 +234,7 @@ def category_detail(request, category_id):
 
 @require_GET
 def review(request):
-    reviews = Review.objects.all()
+    reviews = Review.objects.all().order_by('-created_at')
     return render(request, 'main/review.html', {'reviews': reviews})
 
 # @require_GET

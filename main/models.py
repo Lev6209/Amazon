@@ -40,7 +40,7 @@ class Review(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     username = models.CharField(max_length=50)
     comment = models.TextField(blank=True)
-    stars = models.IntegerField(default=5)
+    stars = models.PositiveSmallIntegerField(default=5)
     recommended = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

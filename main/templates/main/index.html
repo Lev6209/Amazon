@@ -65,7 +65,11 @@
                 <br><br>
             {% else %}
                 Цена: {{ product.price }}$<br>
-                Рейтинг: {{ product.rating }}★<br>
+                {% if product.average_rating is not None %}
+                    <span>Средняя оценка: {{ product.average_rating|floatformat:1 }} ⭐</span><br>
+                {% else %}
+                    <span>Рейтинг: Оценок пока нет</span><br>
+                {% endif %}
                 Продавец: {{ product.seller }}<br>
                 Добавлено: {{ product.created_at | date:"d.m.Y" }}
                 <br><br>

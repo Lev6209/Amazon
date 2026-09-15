@@ -72,3 +72,37 @@ input {
     border-radius: 5px;
     margin-bottom: 10px;
 }
+
+form label {
+    display: inline-block;
+    width: 250px;
+    vertical-align: middle;
+    text-align: right;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+form textarea {
+    vertical-align: middle;
+}
+
+form input[type="checkbox"] {
+    margin-left: -100px;
+    transform: scale(2);
+}
+
+.errorlist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.errorlist li {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-left: 270px;
+    color: red;
+    font-size: 14px;
+}
