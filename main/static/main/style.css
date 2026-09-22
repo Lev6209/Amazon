@@ -111,3 +111,18 @@ form input[type="checkbox"] {
     font-weight: bold;
     text-decoration: underline;
 }
+
+.product-icon-lg {
+    width: 360px;
+    height: 360px;
+    object-fit: contain;
+    border-radius: 16px;
+    background-color: whitesmoke;
+}
+
+.product-icon-sm {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 10px;
+}

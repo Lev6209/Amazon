@@ -10,7 +10,7 @@
 
 
 <div class="container">
-    <img src="{% static 'main/logo.png' %}" alt="Amazon">
+    <img src="{% static 'main/images/logo.png' %}" alt="Amazon">
 </div>
 
 <div class="categories-nav">
@@ -34,6 +34,11 @@
         &nbsp;&nbsp;&nbsp;
         <a href="{% url 'main:paid_products' %}"
         class="{% if request.resolver_match.url_name == 'paid_products' %}active{% endif %}">Платные товары</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{% url 'main:add_product' %}"
+        class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
+
+
     </nav>
 </div>
     <h1>Добро пожаловать в наш магазин!</h1>
@@ -49,7 +54,7 @@
     <br>
 
     <form method="GET" action="{% url 'main:index' %}">
-        <input type="text" name="q" placeholder="Поиск товаров" value="{{ q }}">
+        <input type="text" name="q" placeholder="Поиск товаров во всех категориях" value="{{ q }}">
         <button type="submit">Найти</button>
     </form>
     <br>

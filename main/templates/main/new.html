@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load static %}
+
 {% block title %}Новинки — Amazon{% endblock %}
 
 {% block content %}
@@ -8,6 +10,12 @@
     <ul>
     {% for product in page_obj %}
         <li>
+            {% if product.icon %}
+                <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+
             <a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a><br>
                 Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
             {% if product.price == 0 %}

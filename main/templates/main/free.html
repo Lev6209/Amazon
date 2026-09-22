@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load static %}
+
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
@@ -10,6 +12,12 @@
     <ul>
     {% for product in products %}
         <li>
+            {% if product.icon %}
+                <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+            <br>
             <strong><a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a></strong> –
                 Цена: {{ product.price }} $
             <br>

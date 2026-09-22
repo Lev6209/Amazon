@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load static %}
+
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
@@ -23,6 +25,13 @@
 
     <h2>{{ product.name }}</h2>
 
+    {% if product.icon %}
+        <p><img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-lg"></p>
+    {% else %}
+        <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-lg">
+        <br>
+        <h3 style="margin-left: 70px">Изображения пока нет</h3>
+    {% endif %}
 
     <p>Категория:
         {% if product.category %}

@@ -1,6 +1,7 @@
 This is a studying project.
 
 DZ 12:
+
     1). Путь к context_processors.py:
         Amazon/main/context_processors.py
         Функция: store_menu
@@ -18,3 +19,17 @@ DZ 12:
         Создан отдельный шаблон categories_nav.html, содержащий разметку для списка категорий. 
         Подключение через {% include %} реализовано в base.html.
 
+DZ 13:
+
+    1). Имя поля ImageField: icon
+        Функция upload_to: product_icon_path
+    
+    2). /index/, /new/, /free_products/, /paid_products/, /product/<product_id>/<product_name>/
+
+    3). /add_product/
+
+    4). Задачи со звездочкой выполнены полностью:
+        картинки присутствуют по всему сайту 
+        создан путь upload_to (media/icons/yyyy/mm/имя_файла). Кириллица не ломает загрузку
+        размер загружаемого файла ограничен на 2 мб (формулой 2 * 1024 * 1024). 
+        

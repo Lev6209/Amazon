@@ -11,7 +11,7 @@ from .models import Product
 from .models import Review
 from .models import Category
 
-from .forms import ReviewForm
+from .forms import ReviewForm, ProductForm
 
 SORTS = {
         'price': 'price',
@@ -277,3 +277,14 @@ def api_products(request):
             'rating': product.rating
         })
     return JsonResponse(data, safe=False)
+
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+    else:
+        form = ProductForm()
+    return render(request, 'main/add_product.html', {'form': form})
+

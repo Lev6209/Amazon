@@ -1,5 +1,5 @@
 from django import forms
-from .models import Review
+from .models import Review, Product
 
 
 class ReviewForm(forms.ModelForm):
@@ -45,3 +45,24 @@ class ReviewForm(forms.ModelForm):
         if not username.strip():
             raise forms.ValidationError('Это поле обязательно для заполнения')
         return username
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price', 'category', 'seller', 'icon']
+        labels = {
+            'name': 'Название',
+            'description': 'Описание',
+            'price': 'Цена',
+            'category': 'Категория',
+            'seller': 'Продавец',
+            'icon': 'Изображение',
+        }
+
+    def clean_icon(self):
+        icon = self.cleaned_data.get('icon')
+        if icon and icon.size > 2 * 1024 * 1024:
+            raise forms.ValidationError(
+                'Размер изображения не должен превышать 2 МБ.'
+            )
+        return icon

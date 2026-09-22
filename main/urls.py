@@ -16,5 +16,6 @@ urlpatterns = [
     path('api/product/<int:product_id>/', views.api_product_detail, name='api_product_detail'),
     path('free_products/', views.IndexView.as_view(), {'is_free': True}, name='free_products'),
     path('paid_products/', views.IndexView.as_view(), {'is_free': False}, name='paid_products'),
-    path('api/products/', views.api_products, name='api_products')
+    path('api/products/', views.api_products, name='api_products'),
+    path('add_product/', views.add_product, name='add_product'),
 ]

@@ -1,9 +1,11 @@
 {% extends 'main/base.html' %}
 
+{% load static %}
+
 {% block title %}{{ category.name}} - Amazon{% endblock %}
 
 {% block content %}
-    
+
     <h2>Категория: {{ category.name }}</h2>
 
     <form method="GET" action="{% url 'main:category_detail' category.id %}">
@@ -14,10 +16,16 @@
     <br>
 
     {% if expensive %}
+        <p>Самый дорогой продукт в этой категории:</p>
         <li>
-            <p>Самый дорогой продукт в этой категории:</p>
-                <strong><a href="{% url 'main:product_detail' expensive.id expensive.name%}"></a>{{ expensive.name }}</strong> -
-                Цена: {{ expensive.price }} $
+            {% if expensive.icon %}
+                <img src="{{ expensive.icon.url }}" alt="{{ expensive.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+            <br>
+            <strong><a href="{% url 'main:product_detail' expensive.id expensive.name%}">{{ expensive.name }}</a></strong> -
+            Цена: {{ expensive.price }} $
         </li>
     {% endif %}
 
@@ -33,11 +41,21 @@
     <ul>
     {% for product in page_obj %}
         <li>
+            {% if product.icon %}
+                <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+            <br>
             <strong><a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a></strong> -
             {% if product.price == 0 %}Бесплатно{% else %}{{ product.price }} ${% endif %}
         </li>
     {% empty %}
-        <li>В этой категории приложений пока нет.</li>
+        {% if q %}
+            <li>В данной категории продукт не найден.</li>
+        {% else %}
+            <li>В этой категории товаров пока нет.</li>
+        {% endif %}
     {% endfor %}
     </ul>
 

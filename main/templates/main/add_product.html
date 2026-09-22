@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Добавление продукта - Amazon{% endblock %}
+
+{% block content %}
+
+    <h2>Добавление продукта</h2>
+
+    <p>Заполните карту товара для добавления новой позиции</p>
+
+    <form method="post" action="{% url 'main:add_product' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="width: 200px">Разместить продукт</button>
+    </form>
+    <br>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -20,6 +21,10 @@ class Seller(models.Model):
         verbose_name = 'Продавец'
         verbose_name_plural = 'Продавцы'
 
+def product_icon_path(instance, filename):
+    date = datetime.now()
+    return f'icons/{date:%Y}/{date:%m}/{filename}'
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -28,6 +33,7 @@ class Product(models.Model):
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    icon = models.ImageField(upload_to=product_icon_path, blank=True)
 
     def __str__(self):
         return self.name
