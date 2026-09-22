@@ -10,7 +10,7 @@ body {
 
 a {
     margin-right: 15px;
-    color: #FFCC00;
+    color: #FF9900;
 }
 
 strong a {
@@ -105,4 +105,9 @@ form input[type="checkbox"] {
     margin-left: 270px;
     color: red;
     font-size: 14px;
+}
+
+.categories-nav a.active {
+    font-weight: bold;
+    text-decoration: underline;
 }

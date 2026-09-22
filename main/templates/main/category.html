@@ -3,9 +3,7 @@
 {% block title %}{{ category.name}} - Amazon{% endblock %}
 
 {% block content %}
-
-    <span style="font-size: 36px;">👈&nbsp;</span> <a href="{% url 'main:index' %}">На главную</a>
-
+    
     <h2>Категория: {{ category.name }}</h2>
 
     <form method="GET" action="{% url 'main:category_detail' category.id %}">
@@ -17,7 +15,7 @@
 
     {% if expensive %}
         <li>
-            <p>Самое дорогое приложение в этой категории:</p>
+            <p>Самый дорогой продукт в этой категории:</p>
                 <strong><a href="{% url 'main:product_detail' expensive.id expensive.name%}"></a>{{ expensive.name }}</strong> -
                 Цена: {{ expensive.price }} $
         </li>
@@ -55,5 +53,5 @@
         {% endif %}
     </p>
 
-    <p>Всего в категории {{ products|length }} товаров.</p>
+    <p>Товаров в этой категории: {{ products|length }}</p>
 {% endblock %}

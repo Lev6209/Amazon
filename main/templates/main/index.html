@@ -3,14 +3,7 @@
 {% block title %}Главная страница - Amazon{% endblock %}
 
 {% block content %}
-    <h1>Добро пожаловать в наш магазин!</h1>
 
-    <form method="GET" action="{% url 'main:index' %}">
-        <input type="text" name="q" placeholder="Поиск товаров" value="{{ q }}">
-        <button type="submit">Найти</button>
-    </form>
-    <br>
-    <br>
 
     <h2>Продукт дня:</h2>
     <li>
@@ -20,20 +13,7 @@
             Рейтинг: {{ daily_product.rating }}★
     </li>
 
-    <h2>Список категорий:</h2>
 
-    <li>
-        {% for category in categories %}
-            <strong>
-                <a href="{% url 'main:category_detail' category.id %}">{{ category.name }}</a>
-                ({{ category.product_set.count }}){% if not forloop.last %}, {% endif %}
-            </strong><br>
-
-
-        {% empty %}
-            <li>Нет доступных категорий</li>
-        {% endfor %}
-    </li>
 
     <h2>{{ title }}</h2>
 

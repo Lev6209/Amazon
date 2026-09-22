@@ -126,7 +126,6 @@ class IndexView(ListView):
         context['title'] = title
         context['is_free'] = is_free
         context['daily_product'] = Product.objects.order_by('-price').first()
-        context['categories'] = Category.objects.all()
 
         return context
 

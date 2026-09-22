@@ -13,24 +13,51 @@
     <img src="{% static 'main/logo.png' %}" alt="Amazon">
 </div>
 
+<div class="categories-nav">
     <nav>
-        <a href="{% url 'main:index' %}">Главная</a>
+        <a href="{% url 'main:index' %}"
+        class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Главная</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:about' %}">О магазине</a>
+        <a href="{% url 'main:about' %}"
+        class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">О магазине</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:new' %}">Новинки</a>
+        <a href="{% url 'main:new' %}"
+        class="{% if request.resolver_match.url_name == 'new' %}active{% endif %}">Новинки</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:review' %}">Отзывы покупателей</a>
+        <a href="{% url 'main:review' %}"
+        class="{% if request.resolver_match.url_name == 'review' %}active{% endif %}">Отзывы покупателей</a>
         &nbsp;&nbsp;&nbsp;
 {#        <a href="{% url 'main:free' %}">Бесплатные товары</a>#}
 {#        &nbsp;&nbsp;&nbsp;#}
-        <a href="{% url 'main:free_products' %}">Бесплатные товары</a>
+        <a href="{% url 'main:free_products' %}"
+        class="{% if request.resolver_match.url_name == 'free_products' %}active{% endif %}">Бесплатные товары</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:paid_products' %}">Платные товары</a>
+        <a href="{% url 'main:paid_products' %}"
+        class="{% if request.resolver_match.url_name == 'paid_products' %}active{% endif %}">Платные товары</a>
     </nav>
+</div>
+    <h1>Добро пожаловать в наш магазин!</h1>
 
+    {% if request.resolver_match.url_name != 'index' %}
+    <p>
+        <span style="font-size: 36px;">👈</span>
+        <a href="{% url 'main:index' %}">На главную</a>
+    </p>
+{% endif %}
+
+    {% include 'main/includes/categories_nav.html' %}
+    <br>
+
+    <form method="GET" action="{% url 'main:index' %}">
+        <input type="text" name="q" placeholder="Поиск товаров" value="{{ q }}">
+        <button type="submit">Найти</button>
+    </form>
+    <br>
+    <br>
 
     {% block content %}{% endblock %}
+
+    <footer>Всего на сайте: {{ categories_total}} категорий и {{ products_total }} товаров</footer>
 
 </body>
 </html>
