@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }} - Amazon{% endblock %}
+
+{% block content %}
+
+    <h1 style="text-align: center">Вход</h1>
+
+    <p style="text-align: center">Войдите для добавления товаров и отзывов от своего имени</p>
+    <br>
+
+    <form method="post" style="text-align: center">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="width: 200px">Войти</button>
+    </form>
+    <br>
+    <p style="text-align: center">Еще не зарегистрированы? Тогда вам сюда: &nbsp;<a href="{% url 'main:register' %}">Регистрация</a> </p>
+
+{% endblock %}

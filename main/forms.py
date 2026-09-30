@@ -1,4 +1,7 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
 from .models import Review, Product
 
 
@@ -66,3 +69,23 @@ class ProductForm(forms.ModelForm):
                 'Размер изображения не должен превышать 2 МБ.'
             )
         return icon
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = "Имя пользователя"
+        self.fields['email'].label = "Ваш Email"
+        self.fields['password1'].label = "Пароль"
+        self.fields['password2'].label = "Подтверждение пароля"
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Пользователь с таким email уже существует')
+        return email

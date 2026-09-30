@@ -1,0 +1,5 @@
+{% if average_rating %}
+    {{ average_rating|floatformat:1 }}⭐️
+{% else %}
+    Оценок пока нет
+{% endif %}

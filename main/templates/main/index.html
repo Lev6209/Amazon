@@ -2,10 +2,15 @@
 
 {% load static %}
 
-{% block title %}Главная страница - Amazon{% endblock %}
+{% block title %}{{ title }} - Amazon{% endblock %}
 
 {% block content %}
 
+    {% if just_registered %}
+        <h1>Добро пожаловать, {{ user.username }}! Ваша учетная запись создана!</h1>
+    {%  elif coming_back%}
+        <h1> C возвращением, {{ user.username }}!</h1>
+    {% endif %}
 
 
     <h2>Продукт дня:</h2>
@@ -19,7 +24,7 @@
         <strong><a href="{% url 'main:product_detail' daily_product.id daily_product.name%}">{{ daily_product.name }}</a></strong>
             ({{ daily_product.category }})<br>
             Цена: {{ daily_product.price }}$<br>
-            Рейтинг: {{ daily_product.rating }}★
+            Рейтинг: {{ daily_product.rating }}⭐️
     </li>
 
 
@@ -60,11 +65,7 @@
                 <br><br>
             {% else %}
                 Цена: {{ product.price }}$<br>
-                {% if product.average_rating is not None %}
-                    <span>Средняя оценка: {{ product.average_rating|floatformat:1 }} ⭐</span><br>
-                {% else %}
-                    <span>Рейтинг: Оценок пока нет</span><br>
-                {% endif %}
+                Средняя оценка: {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br>
                 Продавец: {{ product.seller }}<br>
                 Добавлено: {{ product.created_at | date:"d.m.Y" }}
                 <br><br>
@@ -98,4 +99,5 @@
 {% endif %}
 
     <p>Всего товаров: {{ page_obj.paginator.count }}</p>
+
 {% endblock %}

@@ -1,17 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.core.paginator import Paginator
-from django.views import View
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse,reverse_lazy
 
 from .models import Product
 from .models import Review
 from .models import Category
 
-from .forms import ReviewForm, ProductForm
+from .forms import ReviewForm, ProductForm, RegisterForm
 
 SORTS = {
         'price': 'price',
@@ -111,6 +115,16 @@ class IndexView(ListView):
         sort = self.request.GET.get('sort')
         is_free = self.kwargs.get('is_free')
 
+        just_registered = self.request.session.pop(
+            'just_registered',
+            False
+        )
+
+        coming_back = self.request.session.pop(
+            'coming_back',
+            False
+        )
+
         if q and sort is None:
             sort = 'name'
         elif not q and sort is None:
@@ -126,6 +140,8 @@ class IndexView(ListView):
         context['title'] = title
         context['is_free'] = is_free
         context['daily_product'] = Product.objects.order_by('-price').first()
+        context['just_registered'] = just_registered
+        context['coming_back'] = coming_back
 
         return context
 
@@ -170,7 +186,10 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['form'] = ReviewForm()
+        form = ReviewForm()
+        if self.request.user.is_authenticated and 'username'in form.fields:
+            form.fields.pop('username')
+        context['form'] = form
         context['reviews'] = self.object.review_set.order_by('-created_at')
 
         average_rating = Review.objects.filter(
@@ -185,20 +204,27 @@ class ProductDetailView(DetailView):
 @require_POST
 def add_review(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    form = ReviewForm(request.POST)
+    data = request.POST.copy()
+    if request.user.is_authenticated:
+        data['username'] = request.user.username
+    form = ReviewForm(data)
 
     if form.is_valid():
         review = form.save(commit=False)
         review.product = product
         review.save()
-
         messages.success(request, 'Спасибо, ваш отзыв добавлен!')
-
         return redirect('main:product_detail', product.id, product.name)
 
+    if request.user.is_authenticated and 'username' in form.fields:
+        form.fields.pop('username')
     reviews = product.review_set.order_by('-created_at')
 
-    return render(request, 'main/product_detail.html', {'product': product, 'form': form, 'reviews': reviews})
+    return render(request, 'main/product_detail.html', {
+        'product': product,
+        'form': form,
+        'reviews': reviews
+    })
 
 
 @require_GET
@@ -254,6 +280,7 @@ def new(request):
         'page_obj': page_obj
     })
 
+@require_GET
 def api_product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     data = {
@@ -264,7 +291,7 @@ def api_product_detail(request, product_id):
     }
     return JsonResponse(data)
 
-
+@require_GET
 def api_products(request):
     products = Product.objects.all()
     data = []
@@ -278,13 +305,72 @@ def api_products(request):
         })
     return JsonResponse(data, safe=False)
 
-def add_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            product = form.save()
-            return redirect('main:product_detail', product_id=product.id, product_name=product.name)
-    else:
-        form = ProductForm()
-    return render(request, 'main/add_product.html', {'form': form})
+# @login_required
+# def add_product(request):
+#     if request.method == 'POST':
+#         form = ProductForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             product = form.save()
+#             messages.success(request,'Товар успешно добавлен!')
+#
+#             return redirect('main: product_detail', product_id=product.id, product_name=product.name)
+#     else:
+#         form = ProductForm()
+#     return render(request, 'main/add_product.html', {'form': form})
 
+class AddProductView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'main/add_product.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        messages.success(self.request,'Товар успешно добавлен!')
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('main:product_detail',kwargs={
+            'product_id': self.object.id,
+            'product_name': self.object.name,
+        }
+        )
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('main:index')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            request.session['just_registered'] = True
+            return redirect('main:index')
+    else:
+        form = RegisterForm()
+    return render(request, 'main/register.html', {'form': form})
+
+
+class StoreLoginView(LoginView):
+    template_name = 'main/login.html'
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.request.session['coming_back'] = True
+        return response
+
+class StoreLogoutView(LogoutView):
+    next_page = reverse_lazy('main:index')
+
+
+@login_required
+def profile(request):
+    reviews = Review.objects.filter(username=request.user.username).order_by('-created_at')
+
+    products = Product.objects.filter(author=request.user).annotate(average_rating=Avg('review__stars')).order_by('-created_at')
+
+    return render(request, 'main/profile.html', {
+        'reviews': reviews,
+        'products': products
+    })

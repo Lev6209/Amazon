@@ -35,33 +35,54 @@
         <a href="{% url 'main:paid_products' %}"
         class="{% if request.resolver_match.url_name == 'paid_products' %}active{% endif %}">Платные товары</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:add_product' %}"
-        class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
+        <a href="{% url 'main:profile' %}">Профиль</a>
+        &nbsp;&nbsp;&nbsp;
 
-
+        {% if user.is_authenticated %}
+            <a href="{% url 'main:add_product' %}"
+            class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
+            &nbsp;&nbsp;&nbsp;
+            <span>Вы вошли под именем: <strong>{{ user.username }}</strong></span>
+            <form method="post" action="{% url 'main:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                &nbsp;&nbsp;
+                <button type="submit" style="width: 70px; padding: 8px 1px">Выйти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'main:login' %}"
+            class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">Войти</a>
+            <a href="{% url 'main:register' %}"
+            class="{% if request.resolver_match.url_name == 'register' %}active{% endif %}">Зарегистрироваться</a>
+        {% endif %}
     </nav>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
 </div>
-    <h1>Добро пожаловать в наш магазин!</h1>
 
-    {% if request.resolver_match.url_name != 'index' %}
-    <p>
-        <span style="font-size: 36px;">👈</span>
-        <a href="{% url 'main:index' %}">На главную</a>
-    </p>
-{% endif %}
+    {% if request.resolver_match.url_name != 'add_product' and request.resolver_match.url_name != 'profile' and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+        {% include 'main/includes/categories_nav.html' %}
 
-    {% include 'main/includes/categories_nav.html' %}
-    <br>
+        <br>
 
-    <form method="GET" action="{% url 'main:index' %}">
-        <input type="text" name="q" placeholder="Поиск товаров во всех категориях" value="{{ q }}">
-        <button type="submit">Найти</button>
-    </form>
+        <form method="GET" action="{% url 'main:index' %}">
+            <input type="text" name="q" placeholder="Поиск товаров во всех категориях" value="{{ q }}">
+            <button type="submit">Найти</button>
+        </form>
+    {% endif %}
     <br>
     <br>
 
     {% block content %}{% endblock %}
 
+    <br>
+    <br>
     <footer>Всего на сайте: {{ categories_total}} категорий и {{ products_total }} товаров</footer>
 
 </body>

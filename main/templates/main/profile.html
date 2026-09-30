@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }} - Amazon{% endblock %}
+
+{% block content %}
+
+<h1 style="text-align: center">Профиль пользователя</h1>
+
+    <h3><strong>Имя пользователя: </strong>{{ user.username }}</h3>
+
+    <h3><strong>Email: </strong>{{ user.email }}</h3>
+
+    <h2 style="text-align: center">Мои товары</h2>
+
+
+    {% for product in products %}
+        <p><a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a></p>
+        <p style="margin-left: 50px">Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}</p>
+        <p style="margin-left: 50px">Цена:&nbsp; {{ product.price }}$</p>
+        <p style="margin-left: 50px">Продавец:&nbsp; {{ product.seller }}</p>
+        <p style="margin-left: 50px">Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}</p>
+    {% empty %}
+        <p>Товаров от вашего имени пока нет.</p>
+    {% endfor %}
+    <hr>
+    <p>Всего товаров: {{ products.count }}</p>
+    <br>
+    <br>
+
+    <h2 style="text-align: center">Мои отзывы</h2>
+
+
+    {% for review in reviews %}
+
+        <p>Товар:&nbsp;&nbsp;<a href="{% url 'main:product_detail' review.product.id review.product.name %}">{{ review.product.name }}</a></p>
+
+        <p>Оценка:&nbsp;&nbsp;{{ review.stars }}/5</p>
+
+        {% if review.comment %}
+            <p>Комментарий:&nbsp;&nbsp;{{ review.comment }}</p>
+        {% endif %}
+
+        <hr>
+
+    {% empty %}
+
+        <p>Вы пока не оставляли отзывов.</p>
+
+    {% endfor %}
+
+    <p>Всего отзывов: {{ reviews.count }}</p>
+
+{% endblock %}

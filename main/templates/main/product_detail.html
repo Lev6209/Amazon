@@ -17,7 +17,7 @@
     {% endif %}
 
     {{ product.name }}
-</p>
+    </p>
 
     <br>
     <br>
@@ -49,6 +49,9 @@
             {% endif %}
     </p>
 
+
+    <p>Рейтинг: {% include 'main/includes/product_rating.html' %}</p>
+
     {% if product.description %}
         <p>Описание: {{ product.description }}</p>
     {% else %}
@@ -59,18 +62,28 @@
 
     <p>Продавец: {{ product.seller }}</p>
 
-    {% if average_rating is not None %}
-        <p>Рейтинг: {{ average_rating|floatformat:1 }} ⭐</p>
+
+
+    {% if product.author %}
+        <p>Автор: {{ product.author }}</p>
     {% else %}
-        <p>Оценок пока нет</p>
+        <p></p>
     {% endif %}
 
     <hr>
+    
 
     <section>
     <h3>Хотите оставить отзыв?:</h3>
 
-    <form method="post" action="{% url 'main:add_review' product.id %}" novalidate>
+    {% if user.is_authenticated %}
+        <p>Отзыв будет опубликован от имени <strong>{{ user.username }}</strong></p>
+    {% else %}
+        <p>Вы можете оставить отзыв и без регистрации, но лучше войти в учетную запись: &nbsp;<a href="{%  url 'main:login' %}">Войти</a></p>
+    {% endif %}
+
+
+    <form method="post" action="{% url 'main:add_review' product.id %}">
         {% csrf_token %}
         {{ form.non_field_errors }}
 
@@ -101,11 +114,6 @@
         <button type="submit" style="width: 200px; margin-left: 260px">Добавить отзыв</button>
         <br><br>
 
-        {% if messages %}
-            {% for message in messages %}
-                <h3><strong style="margin-left: 260px">{{ message }}</strong></h3>
-            {% endfor %}
-        {% endif %}
         <br><br>
         <hr>
     </form>

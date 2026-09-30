@@ -17,5 +17,11 @@ urlpatterns = [
     path('free_products/', views.IndexView.as_view(), {'is_free': True}, name='free_products'),
     path('paid_products/', views.IndexView.as_view(), {'is_free': False}, name='paid_products'),
     path('api/products/', views.api_products, name='api_products'),
-    path('add_product/', views.add_product, name='add_product'),
+    path('add_product/', views.AddProductView.as_view(), name='add_product'),
+
+    path('register/', views.register, name='register'),
+    path('login/', views.StoreLoginView.as_view(), name='login'),
+    path('logout/', views.StoreLogoutView.as_view(), name='logout'),
+
+    path('profile/', views.profile, name='profile'),
 ]

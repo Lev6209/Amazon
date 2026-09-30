@@ -15,7 +15,7 @@
             {% else %}
                 <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
             {% endif %}
-
+            <br>
             <a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a><br>
                 Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
             {% if product.price == 0 %}
