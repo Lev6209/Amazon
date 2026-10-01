@@ -66,7 +66,15 @@
             {% else %}
                 Цена: {{ product.price }}$<br>
                 Средняя оценка: {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br>
-                Продавец: {{ product.seller }}<br>
+                Продавец: {{ product.seller }}
+                <br>
+                Автор:
+                {% if product.author %}
+                    <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
+                {% else %}
+                    Не указан
+                {% endif %}
+                <br>
                 Добавлено: {{ product.created_at | date:"d.m.Y" }}
                 <br><br>
             {% endif %}

@@ -82,6 +82,13 @@ form label {
     font-weight: bold;
 }
 
+form label[for$="-clear_id"] {
+    width: auto;
+    margin-left: -100px;
+    margin-right: 0;
+    text-align: left;
+}
+
 form textarea {
     vertical-align: middle;
 }

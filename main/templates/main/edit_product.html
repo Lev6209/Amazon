@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }} Редактирование продукта - Amazon{% endblock %}
+
+{% block content %}
+
+    <h1 style="text-align: center">Редактирование продукта {{ product.name }}</h1>
+
+    <br>
+
+    <form method="post" action="{% url 'main:edit_product' product.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="width: 200px; margin-left: 19%">Применить изменения</button>
+    </form>
+
+    <p><a href="{% url 'main:product_detail' product.id product.name %}">Назад к карточке продукта</a> </p>
+
+    <br>
+
+{% endblock %}

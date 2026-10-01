@@ -12,4 +12,4 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'rating', 'seller', 'created_at')
+    list_display = ('name', 'category', 'price', 'rating', 'seller', 'author', 'created_at')

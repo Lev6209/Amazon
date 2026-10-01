@@ -14,42 +14,57 @@
 
     <h2 style="text-align: center">Мои товары</h2>
 
-
     {% for product in products %}
-        <p><a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a></p>
-        <p style="margin-left: 50px">Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}</p>
-        <p style="margin-left: 50px">Цена:&nbsp; {{ product.price }}$</p>
-        <p style="margin-left: 50px">Продавец:&nbsp; {{ product.seller }}</p>
-        <p style="margin-left: 50px">Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}</p>
+        <li>
+            {% if product.icon %}
+                <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+            <br>
+            <a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a><br>
+            Категория:&nbsp; {{ product.category }}<br>
+            Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}<br>
+            Цена:&nbsp; {{ product.price }}$<br>
+            Продавец:&nbsp; {{ product.seller }}<br>
+            Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br><br>
+            <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
+            &nbsp;&nbsp;&nbsp;
+            {% if product.author_id == user.id %}
+                <form method="post"
+                      action="{% url 'main:delete_product' product.id %}"
+                      style="display: inline;"
+                      onsubmit="return confirm('Вы уверены, что хотите удалить этот товар?');">
+                    {% csrf_token %}
+                    <button type="submit" style="width: 150px">Удалить товар</button>
+                </form>
+            {% endif %}
+        </li>
+        <hr>
     {% empty %}
         <p>Товаров от вашего имени пока нет.</p>
+        <hr>
     {% endfor %}
-    <hr>
     <p>Всего товаров: {{ products.count }}</p>
     <br>
     <br>
 
     <h2 style="text-align: center">Мои отзывы</h2>
 
-
     {% for review in reviews %}
-
-        <p>Товар:&nbsp;&nbsp;<a href="{% url 'main:product_detail' review.product.id review.product.name %}">{{ review.product.name }}</a></p>
-
-        <p>Оценка:&nbsp;&nbsp;{{ review.stars }}/5</p>
-
-        {% if review.comment %}
-            <p>Комментарий:&nbsp;&nbsp;{{ review.comment }}</p>
-        {% endif %}
-
+        <li>
+            Товар:&nbsp;&nbsp;<a href="{% url 'main:product_detail' review.product.id review.product.name %}">{{ review.product.name }}</a><br>
+            Ваша оценка:&nbsp;&nbsp;{{ review.stars }}<br>
+            {% if review.comment %}
+                Ваш комментарий:&nbsp;&nbsp;{{ review.comment }}
+            {% endif %}
+        </li>
         <hr>
 
     {% empty %}
-
         <p>Вы пока не оставляли отзывов.</p>
-
     {% endfor %}
-
+    <hr>
     <p>Всего отзывов: {{ reviews.count }}</p>
 
 {% endblock %}

@@ -64,14 +64,34 @@
 
 
 
+    Автор:
     {% if product.author %}
-        <p>Автор: {{ product.author }}</p>
+        <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
     {% else %}
-        <p></p>
+        Не указан
     {% endif %}
+    <br>
+    <br>
 
+    {% if user.is_authenticated %}
+        {% if user.is_staff or product.author_id == user.id %}
+            <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
+        {% endif %}
+    {% endif %}
+    &nbsp;&nbsp;&nbsp;
+    {% if product.author_id == user.id %}
+        <form method="post"
+              action="{% url 'main:delete_product' product.id %}"
+              style="display: inline;"
+              onsubmit="return confirm('Вы уверены, что хотите удалить этот товар?');">
+            {% csrf_token %}
+            <button type="submit" style="width: 150px">Удалить товар</button>
+        </form>
+    {% endif %}
+    <br>
+    <br>
     <hr>
-    
+
 
     <section>
     <h3>Хотите оставить отзыв?:</h3>

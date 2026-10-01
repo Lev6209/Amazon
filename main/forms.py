@@ -62,6 +62,13 @@ class ProductForm(forms.ModelForm):
             'icon': 'Изображение',
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['icon'].widget.initial_text = 'Текущее'
+        self.fields['icon'].widget.input_text = 'Заменить на'
+        self.fields['icon'].widget.clear_checkbox_label = 'Удалить'
+
+
     def clean_icon(self):
         icon = self.cleaned_data.get('icon')
         if icon and icon.size > 2 * 1024 * 1024:

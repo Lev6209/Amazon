@@ -1,14 +1,19 @@
+from itertools import product
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+
 from django.urls import reverse,reverse_lazy
 
 from .models import Product
@@ -79,6 +84,7 @@ class IndexView(ListView):
     paginate_by = 5
 
     def get_queryset(self):
+
         q = self.request.GET.get('q', '')
         sort = self.request.GET.get('sort')
         is_free = self.kwargs.get('is_free')
@@ -89,6 +95,8 @@ class IndexView(ListView):
             products = Product.objects.filter(price__gt=0)
         else:
             products = Product.objects.all()
+
+        products = products.select_related('author')
 
         products = products.annotate(
             average_rating=Avg('review__stars')
@@ -372,5 +380,46 @@ def profile(request):
 
     return render(request, 'main/profile.html', {
         'reviews': reviews,
+        'products': products
+    })
+
+@login_required
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if not request.user.is_staff and product.author_id != request.user.id:
+        messages.error(request, 'Редактировать карту продукта может только автор')
+        return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Карта товара {product.name} обновлена успешно!")
+            return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'main/edit_product.html', {
+        'form': form,
+        'product': product
+    })
+
+@login_required
+@require_POST
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if product.author_id != request.user.id:
+        messages.error(request, 'Удалять товар может только его автор')
+        return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+
+    product.delete()
+    messages.success(request, 'Товар удален успешно!')
+    return redirect('main:index')
+
+def author_detail(request, user_id):
+    author = get_object_or_404(User, id=user_id)
+    products = Product.objects.filter(author=author).order_by('-created_at')
+
+    return render(request, 'main/author_detail.html', {
+        'author': author,
         'products': products
     })

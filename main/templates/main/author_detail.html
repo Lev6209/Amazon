@@ -1,0 +1,44 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Автор {{ author.username }} - Amazon{% endblock %}
+
+{% block content %}
+
+    <h2>Все продукты автора {{ author.username }}:</h2>
+
+    <ul>
+        {% for product in products %}
+            <li>
+                {% if product.icon %}
+                    <img src="{{ product.icon.url }}"
+                         alt="{{ product.name }}"
+                         class="product-icon-sm">
+                {% else %}
+                    <img src="{% static 'main/images/placeholder.png' %}"
+                         alt="Нет изображения"
+                         class="product-icon-sm">
+                {% endif %}
+
+                <br>
+
+                <a href="{% url 'main:product_detail' product.id product.name %}">
+                    {{ product.name }}
+                </a>
+
+                <br>
+                Категория:&nbsp; {{ product.category }}<br>
+                Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}<br>
+                Цена:&nbsp; {{ product.price }}$<br>
+                Продавец:&nbsp; {{ product.seller }}
+            </li>
+
+        {% empty %}
+            <p>У этого автора пока нет товаров.</p>
+        {% endfor %}
+    </ul>
+    <hr>
+    <p>Всего товаров: {{ products.count }}</p>
+    <br>
+
+{% endblock %}

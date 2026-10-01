@@ -35,12 +35,12 @@
         <a href="{% url 'main:paid_products' %}"
         class="{% if request.resolver_match.url_name == 'paid_products' %}active{% endif %}">Платные товары</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'main:profile' %}">Профиль</a>
-        &nbsp;&nbsp;&nbsp;
 
         {% if user.is_authenticated %}
             <a href="{% url 'main:add_product' %}"
             class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="{% url 'main:profile' %}">Профиль</a>
             &nbsp;&nbsp;&nbsp;
             <span>Вы вошли под именем: <strong>{{ user.username }}</strong></span>
             <form method="post" action="{% url 'main:logout' %}" style="display: inline;">
@@ -83,6 +83,7 @@
 
     <br>
     <br>
+    <hr>
     <footer>Всего на сайте: {{ categories_total}} категорий и {{ products_total }} товаров</footer>
 
 </body>
