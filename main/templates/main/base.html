@@ -27,8 +27,6 @@
         <a href="{% url 'main:review' %}"
         class="{% if request.resolver_match.url_name == 'review' %}active{% endif %}">Отзывы покупателей</a>
         &nbsp;&nbsp;&nbsp;
-{#        <a href="{% url 'main:free' %}">Бесплатные товары</a>#}
-{#        &nbsp;&nbsp;&nbsp;#}
         <a href="{% url 'main:free_products' %}"
         class="{% if request.resolver_match.url_name == 'free_products' %}active{% endif %}">Бесплатные товары</a>
         &nbsp;&nbsp;&nbsp;

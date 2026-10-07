@@ -1,4 +1,5 @@
 from itertools import product
+from pyclbr import Class
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
@@ -10,7 +11,16 @@ from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+    PasswordChangeView,
+    PasswordChangeDoneView,
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
@@ -386,7 +396,11 @@ def profile(request):
 @login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    if not request.user.is_staff and product.author_id != request.user.id:
+    if not (
+            request.user.has_perm('main.change_product')
+            or request.user.is_staff
+            or product.author_id == request.user.id
+    ):
         messages.error(request, 'Редактировать карту продукта может только автор')
         return redirect('main:product_detail', product_id=product.id, product_name=product.name)
 
@@ -423,3 +437,40 @@ def author_detail(request, user_id):
         'author': author,
         'products': products
     })
+
+class StorePasswordResetView(PasswordResetView):
+    template_name = 'main/password_reset_form.html'
+    email_template_name = 'main/password_reset_email.html'
+    subject_template_name = 'main/password_reset_subject.txt'
+    success_url = reverse_lazy('main:password_reset_done')
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        form.fields['email'].label = 'Электронная почта'
+        return form
+
+
+class StorePasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'main/password_reset_done.html'
+
+class StorePasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'main/password_reset_confirm.html'
+    success_url = reverse_lazy('main:password_reset_complete')
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        if form is not None and 'new_password1' in form.fields:
+            form.fields['new_password1'].label = 'Новый пароль'
+            form.fields['new_password2'].label = 'Повтор пароля'
+        return form
+
+class StorePasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'main/password_reset_complete.html'
+
+
+class StorePasswordChangeView(PasswordChangeView):
+    template_name = 'main/password_change_form.html'
+    success_url = reverse_lazy('main:password_change_done')
+
+class StorePasswordChangeDoneView(TemplateView):
+    template_name = 'main/password_change_done.html'

@@ -29,4 +29,12 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('author/<int:user_id>/', views.author_detail, name='author_detail'),
 
+    path('password-reset/', views.StorePasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', views.StorePasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', views.StorePasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/complete/', views.StorePasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('password-change/', views.StorePasswordChangeView.as_view(), name='password_change'),
+    path('password-change/done/', views.StorePasswordChangeDoneView.as_view(), name='password_change_done')
+
+
 ]

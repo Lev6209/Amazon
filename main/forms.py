@@ -92,7 +92,7 @@ class RegisterForm(UserCreationForm):
         self.fields['password2'].label = "Подтверждение пароля"
 
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data['email'].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError('Пользователь с таким email уже существует')
+            raise forms.ValidationError('Пользователь с такой почтой уже существует')
         return email

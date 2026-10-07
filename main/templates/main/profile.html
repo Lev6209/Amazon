@@ -12,6 +12,9 @@
 
     <h3><strong>Email: </strong>{{ user.email }}</h3>
 
+    <button type="button" onclick="window.location.href='{% url 'main:password_change' %}'" style="width: 150px">Изменить пароль</button>
+            &nbsp;&nbsp;&nbsp;
+
     <h2 style="text-align: center">Мои товары</h2>
 
     {% for product in products %}
