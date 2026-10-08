@@ -24,7 +24,7 @@ from django.contrib.auth.views import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
-from django.urls import reverse,reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from .models import Product
 from .models import Review
@@ -199,6 +199,11 @@ class ProductDetailView(DetailView):
                 product.name
             )
 
+        recently_viewed = request.session.get('recently_viewed', [])
+        if product.id in recently_viewed:
+            recently_viewed.remove(product.id)
+        recently_viewed.insert(0, product.id)
+        request.session['recently_viewed'] = recently_viewed[:7]
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -209,12 +214,35 @@ class ProductDetailView(DetailView):
             form.fields.pop('username')
         context['form'] = form
         context['reviews'] = self.object.review_set.order_by('-created_at')
+        context['is_favorite'] = (
+                self.request.user.is_authenticated
+                and self.object.favorited_by.filter(pk=self.request.user.pk).exists()
+        )
 
         average_rating = Review.objects.filter(
             product=self.object
         ).aggregate(Avg('stars'))['stars__avg']
-
         context['average_rating'] = average_rating
+
+        recently_viewed_ids = self.request.session.get('recently_viewed', [])
+
+        recently_viewed_ids = [
+            product_id
+            for product_id in recently_viewed_ids
+            if product_id != self.object.id
+        ]
+
+        recently_viewed = Product.objects.filter(
+            id__in=recently_viewed_ids
+        ).annotate(
+            average_rating=Avg('review__stars')
+        )
+
+        recently_viewed = sorted(
+            recently_viewed,
+            key=lambda product: recently_viewed_ids.index(product.id)
+        )
+        context['recently_viewed'] = recently_viewed
 
         return context
 
@@ -241,7 +269,8 @@ def add_review(request, product_id):
     return render(request, 'main/product_detail.html', {
         'product': product,
         'form': form,
-        'reviews': reviews
+        'reviews': reviews,
+        'is_favorite': request.user.is_authenticated and product.favorited_by.filter(pk=request.user.pk).exists()
     })
 
 
@@ -474,3 +503,44 @@ class StorePasswordChangeView(PasswordChangeView):
 
 class StorePasswordChangeDoneView(TemplateView):
     template_name = 'main/password_change_done.html'
+
+@login_required()
+def favorites(request):
+    products = request.user.favorite_products.select_related('category', 'author').order_by('name')
+    return render(request, 'main/favorites.html', {'products': products})
+
+@require_POST
+def add_to_favorites(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if not request.user.is_authenticated:
+        login_url = reverse('main:login')
+        next_url = reverse(
+            'main:product_detail',
+            args=[product.id, product.name]
+        )
+        return redirect(f'{login_url}?next={next_url}')
+
+    if product.favorited_by.filter(pk=request.user.pk).exists():
+        product.favorited_by.remove(request.user)
+        messages.success(
+            request,
+            f'Товар "{product.name}" удален из избранных'
+        )
+    else:
+        product.favorited_by.add(request.user)
+        messages.success(
+            request,
+            f'Товар "{product.name}" добавлен в избранные'
+        )
+
+    next_url = request.POST.get('next')
+
+    if next_url:
+        return redirect(next_url)
+
+    return redirect(
+        'main:product_detail',
+        product_id=product.id,
+        product_name=product.name
+    )

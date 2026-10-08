@@ -11,6 +11,10 @@ urlpatterns = [
     path('product/<int:product_id>/edit/', views.edit_product, name='edit_product'),
     path('product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     path('product/<int:product_id>/review/', views.add_review, name='add_review'),
+
+    path('favorites/', views.favorites, name='favorites'),
+    path('product/<int:product_id>/add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),
+
     path('product/<int:product_id>/<str:product_name>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
 
@@ -34,7 +38,9 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', views.StorePasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/complete/', views.StorePasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('password-change/', views.StorePasswordChangeView.as_view(), name='password_change'),
-    path('password-change/done/', views.StorePasswordChangeDoneView.as_view(), name='password_change_done')
+    path('password-change/done/', views.StorePasswordChangeDoneView.as_view(), name='password_change_done'),
+
+
 
 
 ]

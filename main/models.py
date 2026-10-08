@@ -36,6 +36,7 @@ class Product(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
     icon = models.ImageField(upload_to=product_icon_path, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
+    favorited_by = models.ManyToManyField(User, related_name='favorite_products', blank=True, verbose_name='В избранном у')
 
     def __str__(self):
         return self.name

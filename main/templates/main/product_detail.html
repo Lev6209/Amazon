@@ -73,9 +73,10 @@
     <br>
     <br>
 
+
     {% if user.is_authenticated %}
         {% if perms.main.change_product or user.is_staff or product.author_id == user.id %}
-            <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
+            <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 190px; height: 50px">Редактировать</button>
         {% endif %}
     &nbsp;&nbsp;&nbsp;
         {% if product.author_id == user.id %}
@@ -84,10 +85,24 @@
                   style="display: inline;"
                   onsubmit="return confirm('Вы уверены, что хотите удалить этот товар?');">
                 {% csrf_token %}
-                <button type="submit" style="width: 150px">Удалить товар</button>
+                <button type="submit" style="width: 190px; height: 50px">Удалить товар</button>
             </form>
         {% endif %}
+        &nbsp;&nbsp;&nbsp;
+        <form method="post" style="display: inline" action="{% url 'main:add_to_favorites' product.id %}">
+            {% csrf_token %}
+            {% if is_favorite %}
+                <button type="submit" style="width: 190px; height: 50px">Удалить из избранных</button>
+            {% else %}
+                <button type="submit" style="width: 190px; height: 50px">Добавить в избранные</button>
+            {% endif %}
+        </form>
+    {% else %}
+        <button type="button" onclick="window.location.href='{% url 'main:login' %}?next={{ request.path }}'" style="width: 190px; height: 50px">Войдите</button>
+            <p>Чтобы добавить товар в избранные</p>
+
     {% endif %}
+
     <br>
     <br>
     <hr>
@@ -166,5 +181,7 @@
 
     <hr>
     <p>Всего отзывов: {{ product.review_set.count }}</p>
+
+    {% include 'main/includes/recently_viewed.html' %}
 
 {% endblock %}

@@ -2,52 +2,14 @@
 
 {% load static %}
 
-{% block title %}{{ title }}Главная - Amazon{% endblock %}
+{% block title %}{{ title }}Избранные - Amazon{% endblock %}
 
 {% block content %}
 
-    {% if just_registered %}
-        <h1>Добро пожаловать, {{ user.username }}! Ваша учетная запись создана!</h1>
-    {%  elif coming_back%}
-        <h1> C возвращением, {{ user.username }}!</h1>
-    {% endif %}
-
-
-    <h2>Продукт дня:</h2>
-    <li>
-        {% if daily_product.icon %}
-            <img src="{{ daily_product.icon.url }}" alt="{{ daily_product.name }}" class="product-icon-sm">
-        {% else %}
-            <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
-        {% endif %}
-        <br>
-        <strong><a href="{% url 'main:product_detail' daily_product.id daily_product.name%}">{{ daily_product.name }}</a></strong>
-            ({{ daily_product.category }})<br>
-            Цена: {{ daily_product.price }}$<br>
-            Рейтинг: {{ daily_product.rating }}⭐️
-    </li>
-
-
-
-    <h2>{{ title }}</h2>
-
-    <p>
-    Сортировка:
-        &nbsp;&nbsp;&nbsp;
-    <a href="?sort=new">Новые</a>|
-        &nbsp;&nbsp;
-    <a href="?sort=name">По названию</a>
-
-    {% if not is_free %}
-        |&nbsp;&nbsp;
-        <a href="?sort=price">Сначала дешёвые</a>
-        |&nbsp;&nbsp;&nbsp;
-        <a href="?sort=-price">Сначала дорогие</a>
-    {% endif %}
-</p>
+    <h2>Ваши избранные товары</h2>
 
     <ul>
-        {% for product in page_obj %}
+        {% for product in products %}
         <li>
             {% if product.icon %}
             <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
@@ -74,14 +36,19 @@
                 {% else %}
                     Не указан
                 {% endif %}
-                <br>
-                Добавлено: {{ product.created_at | date:"d.m.Y" }}
                 <br><br>
             {% endif %}
+
+         <form method="post" style="display: inline" action="{% url 'main:add_to_favorites' product.id %}">
+            {% csrf_token %}
+             <input type="hidden" name="next" value="{% url 'main:favorites' %}">
+                <button type="submit" style="width: 190px; height: 50px">Удалить из избранных</button>
+        </form>
+
         </li>
 
         {% empty %}
-            <li>Нет доступных продуктов</li>
+            <li>В избранные вы пока ничего не добавили</li>
         {% endfor %}
     </ul>
 
@@ -106,7 +73,7 @@
     </p>
 {% endif %}
 
-    <p>Всего товаров: {{ page_obj.paginator.count }}</p>
+    <p>Всего товаров: {{ products|length }}</p>
 
     {% include 'main/includes/recently_viewed.html' %}
 

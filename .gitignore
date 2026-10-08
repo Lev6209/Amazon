@@ -224,3 +224,7 @@ db.sqlite3
 .DS_Store
 
 /media/
+
+staticfiles/
+
+data.json

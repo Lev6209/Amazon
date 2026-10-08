@@ -133,3 +133,38 @@ form input[type="checkbox"] {
     object-fit: contain;
     border-radius: 10px;
 }
+
+.recently-viewed-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.recently-viewed-card {
+    width: 220px;
+    height: 220px;
+    box-sizing: border-box;
+    padding: 12px;
+    background: #CCFFFF;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.recently-viewed-card p {
+    margin: 5px 0;
+}
+
+.recently-viewed-image-box {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recently-viewed-title {
+    margin-bottom: 8px;
+}

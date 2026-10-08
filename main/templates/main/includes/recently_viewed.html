@@ -1,0 +1,56 @@
+{% load static %}
+
+{% if recently_viewed %}
+    <hr>
+
+    <h3>Недавно смотрели:</h3>
+
+    <div class="recently-viewed-container">
+
+        {% for recent_product in recently_viewed %}
+
+            <div class="recently-viewed-card">
+
+                <div class="recently-viewed-image-box">
+                    {% if recent_product.icon %}
+                        <img src="{{ recent_product.icon.url }}"
+                             alt="{{ recent_product.name }}"
+                             class="product-icon-sm">
+                    {% else %}
+                        <img src="{% static 'main/images/placeholder.png' %}"
+                             alt="Нет изображения"
+                             class="product-icon-sm">
+                    {% endif %}
+                </div>
+
+            <div class="recently-viewed-title">
+                <strong>
+                    <a href="{% url 'main:product_detail' recent_product.id recent_product.name %}">
+                        {{ recent_product.name }}
+                    </a>
+                </strong>
+            </div>
+
+                <p>
+                    Категория: {{ recent_product.category }}
+                </p>
+            
+                <p>
+                    {% if recent_product.price == 0 %}
+                        <strong>Бесплатно</strong>
+                    {% else %}
+                        <strong>Цена: {{ recent_product.price }} $</strong>
+                    {% endif %}
+                </p>
+
+                <p>
+                    Рейтинг:
+                    {% include 'main/includes/product_rating.html' with average_rating=recent_product.average_rating %}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+{% endif %}

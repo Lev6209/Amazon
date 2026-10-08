@@ -6,6 +6,7 @@ admin.site.register(Seller)
 admin.site.register(Category)
 
 
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('username', 'product', 'stars', 'created_at')
@@ -13,3 +14,6 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'price', 'rating', 'seller', 'author', 'created_at')
+    search_fields = ('name', 'description')
+    list_filter = ('category', 'seller')
+    filter_horizontal = ('favorited_by',)

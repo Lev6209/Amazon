@@ -38,7 +38,11 @@
             <a href="{% url 'main:add_product' %}"
             class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
             &nbsp;&nbsp;&nbsp;
-            <a href="{% url 'main:profile' %}">Профиль</a>
+            <a href="{% url 'main:favorites' %}"
+            class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">Избранное ({{ favorites_count }})</a></a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="{% url 'main:profile' %}"
+            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Профиль</a>
             &nbsp;&nbsp;&nbsp;
             <span>Вы вошли под именем: <strong>{{ user.username }}</strong></span>
             <form method="post" action="{% url 'main:logout' %}" style="display: inline;">
