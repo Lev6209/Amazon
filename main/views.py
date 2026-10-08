@@ -1,5 +1,7 @@
 from itertools import product
 from pyclbr import Class
+import os
+import secrets
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
@@ -7,6 +9,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
+from django.conf import settings
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -31,6 +34,8 @@ from .models import Review
 from .models import Category
 
 from .forms import ReviewForm, ProductForm, RegisterForm
+
+
 
 SORTS = {
         'price': 'price',
@@ -543,4 +548,37 @@ def add_to_favorites(request, product_id):
         'main:product_detail',
         product_id=product.id,
         product_name=product.name
+    )
+
+
+def site_access(request):
+    error = None
+
+    if request.method == 'POST':
+        entered_password = request.POST.get('password', '')
+        correct_password = os.environ.get('SITE_ACCESS_PASSWORD', '')
+
+        if (
+            correct_password
+            and secrets.compare_digest(entered_password, correct_password)
+        ):
+            response = redirect('main:index')
+
+            response.set_cookie(
+                'amazon_site_access',
+                correct_password,
+                max_age=60 * 60 * 24 * 30,
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+            )
+
+            return response
+
+        error = 'Неверный пароль'
+
+    return render(
+        request,
+        'main/site_access.html',
+        {'error': error},
     )
