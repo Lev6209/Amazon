@@ -15,10 +15,12 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
         {{ form.as_p }}
+        <p style="margin-left: 270px; margin-top: -15px"><a href="{% url 'main:password_reset' %}">Забыли пароль?</a></p>
+        <br>
         <button type="submit" style="width: 200px">Войти</button>
     </form>
     <br>
     <p style="text-align: center">Еще не зарегистрированы? Тогда вам сюда: &nbsp;<a href="{% url 'main:register' %}">Регистрация</a> </p>
 
-    <p><a href="{% url 'main:password_reset' %}">Забыли пароль?</a> </p>
+
 {% endblock %}
