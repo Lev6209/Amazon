@@ -16,7 +16,7 @@ urlpatterns = [
     path('favorites/', views.favorites, name='favorites'),
     path('product/<int:product_id>/add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),
 
-    path('product/<int:product_id>/<str:product_name>/', views.ProductDetailView.as_view(), name='product_detail'),
+    path('product/<int:product_id>/<path:product_name>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
 
     # path('free/', views.free, name='free'),
