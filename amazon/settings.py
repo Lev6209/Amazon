@@ -173,5 +173,12 @@ LOGIN_URL = 'main:login'
 LOGIN_REDIRECT_URL = 'main:index'
 LOGOUT_REDIRECT_URL = 'main:index'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'store@amazon.local'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+if os.environ.get('BREVO_API_KEY'):
+    EMAIL_BACKEND = 'main.email_backend.BrevoEmailBackend'
+    DEFAULT_FROM_EMAIL = 'Amazon <amazon@ishoyev.com>'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'Amazon <amazon@ishoyev.com>'
