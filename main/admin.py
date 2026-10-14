@@ -13,7 +13,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'rating', 'seller', 'author', 'created_at')
+    list_display = ('name', 'category', 'price', 'rating_avg', 'seller', 'author', 'created_at', 'rating_count')
     search_fields = ('name', 'description')
     list_filter = ('category', 'seller')
     filter_horizontal = ('favorited_by',)

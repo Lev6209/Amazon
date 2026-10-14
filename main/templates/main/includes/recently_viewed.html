@@ -34,7 +34,7 @@
                 <p>
                     Категория: {{ recent_product.category }}
                 </p>
-            
+
                 <p>
                     {% if recent_product.price == 0 %}
                         <strong>Бесплатно</strong>
@@ -45,7 +45,7 @@
 
                 <p>
                     Рейтинг:
-                    {% include 'main/includes/product_rating.html' with average_rating=recent_product.average_rating %}
+                    {% include 'main/includes/product_rating.html' with product=recent_product %}
                 </p>
 
             </div>

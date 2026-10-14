@@ -24,7 +24,7 @@
         <strong><a href="{% url 'main:product_detail' daily_product.id daily_product.name%}">{{ daily_product.name }}</a></strong>
             ({{ daily_product.category }})<br>
             Цена: {{ daily_product.price }}$<br>
-            Рейтинг: {{ daily_product.rating }}⭐️
+            Рейтинг: {% include 'main/includes/product_rating.html' with product=daily_product %}
     </li>
 
 
@@ -43,6 +43,8 @@
         <a href="?sort=price">Сначала дешёвые</a>
         |&nbsp;&nbsp;&nbsp;
         <a href="?sort=-price">Сначала дорогие</a>
+        |&nbsp;&nbsp;&nbsp;
+        <a href="?sort=rating">Сначала лучшие</a>
     {% endif %}
 </p>
 
@@ -61,11 +63,23 @@
 
             {% if product.price == 0 %}
                 Этот продукт бесплатный<br>
+                Рейтинг: {% include 'main/includes/product_rating.html' %}
+                <br>
+                Продавец: {{ product.seller }}
+                <br>
+                Автор:
+                {% if product.author %}
+                    <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
+                {% else %}
+                    Не указан
+                {% endif %}
+                <br>
                 Добавлено: {{ product.created_at | date:"d.m.Y" }}
                 <br><br>
             {% else %}
                 Цена: {{ product.price }}$<br>
-                Средняя оценка: {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br>
+                Рейтинг: {% include 'main/includes/product_rating.html' %}
+                <br>
                 Продавец: {{ product.seller }}
                 <br>
                 Автор:

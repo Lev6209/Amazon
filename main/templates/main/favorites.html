@@ -27,7 +27,7 @@
                 <br><br>
             {% else %}
                 Цена: {{ product.price }}$<br>
-                Средняя оценка: {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br>
+                Средняя оценка: {% include 'main/includes/product_rating.html' %}<br>
                 Продавец: {{ product.seller }}
                 <br>
                 Автор:

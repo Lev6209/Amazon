@@ -30,7 +30,7 @@
             Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}<br>
             Цена:&nbsp; {{ product.price }}$<br>
             Продавец:&nbsp; {{ product.seller }}<br>
-            Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' with average_rating=product.average_rating %}<br><br>
+            Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' %}<br><br>
             <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
             &nbsp;&nbsp;&nbsp;
             {% if product.author_id == user.id %}
@@ -67,7 +67,6 @@
     {% empty %}
         <p>Вы пока не оставляли отзывов.</p>
     {% endfor %}
-    <hr>
     <p>Всего отзывов: {{ reviews.count }}</p>
 
 {% endblock %}

@@ -1,4 +1,4 @@
-from django.db.models import Count, Avg
+from django.db.models import Count
 
 from .models import Product, Category
 
@@ -17,11 +17,7 @@ def store_menu(request):
 
     recently_viewed_ids = request.session.get('recently_viewed', [])
 
-    recently_viewed = Product.objects.filter(
-        id__in=recently_viewed_ids
-    ).annotate(
-    average_rating=Avg('review__stars')
-    )
+    recently_viewed = Product.objects.filter(id__in=recently_viewed_ids)
 
     recently_viewed = sorted(
         recently_viewed,

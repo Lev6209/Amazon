@@ -1,5 +1,11 @@
-{% if average_rating %}
-    {{ average_rating|floatformat:1 }}⭐️
+{#{% if average_rating %}#}
+{#    {{ average_rating|floatformat:1 }}⭐️#}
+{#{% else %}#}
+{#    Оценок пока нет#}
+{#{% endif %}#}
+
+{% if product.rating_count %}
+    {{ product.rating_avg }}⭐️ из 5 (отзывов: {{ product.rating_count }})
 {% else %}
     Оценок пока нет
 {% endif %}

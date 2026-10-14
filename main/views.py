@@ -4,7 +4,7 @@ import os
 import secrets
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q, Avg
+from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
@@ -113,24 +113,30 @@ class IndexView(ListView):
 
         products = products.select_related('author')
 
-        products = products.annotate(
-            average_rating=Avg('review__stars')
-        )
-
-
         if q:
             products = products.filter(
                 Q(name__icontains=q) |
                 Q(description__icontains=q)
             )
+
             if sort is None:
                 sort = 'name'
         else:
             if sort is None:
                 sort = 'new'
 
-        return products.order_by(SORTS.get(sort, '-created_at'))
+        if sort == 'rating':
+            products = products.order_by(
+                '-rating_avg',
+                '-rating_count',
+                'name'
+            )
+        else:
+            products = products.order_by(
+                SORTS.get(sort, '-created_at')
+            )
 
+        return products
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -224,11 +230,6 @@ class ProductDetailView(DetailView):
                 and self.object.favorited_by.filter(pk=self.request.user.pk).exists()
         )
 
-        average_rating = Review.objects.filter(
-            product=self.object
-        ).aggregate(Avg('stars'))['stars__avg']
-        context['average_rating'] = average_rating
-
         recently_viewed_ids = self.request.session.get('recently_viewed', [])
 
         recently_viewed_ids = [
@@ -239,8 +240,6 @@ class ProductDetailView(DetailView):
 
         recently_viewed = Product.objects.filter(
             id__in=recently_viewed_ids
-        ).annotate(
-            average_rating=Avg('review__stars')
         )
 
         recently_viewed = sorted(
@@ -353,7 +352,8 @@ def api_products(request):
             'name': product.name,
             'description': product.description,
             'price': product.price,
-            'rating': product.rating
+            'rating_avg': product.rating_avg,
+            'rating_count': product.rating_count,
         })
     return JsonResponse(data, safe=False)
 
@@ -420,7 +420,7 @@ class StoreLogoutView(LogoutView):
 def profile(request):
     reviews = Review.objects.filter(username=request.user.username).order_by('-created_at')
 
-    products = Product.objects.filter(author=request.user).annotate(average_rating=Avg('review__stars')).order_by('-created_at')
+    products = Product.objects.filter(author=request.user).order_by('-created_at')
 
     return render(request, 'main/profile.html', {
         'reviews': reviews,
