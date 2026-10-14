@@ -43,7 +43,7 @@ def review_saved(sender, instance, created, **kwargs):
                 ),
                 from_email=None,
                 recipient_list=[author.email],
-                fail_silently=False,
+                fail_silently=True,
             )
 
 
