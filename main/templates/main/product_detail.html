@@ -10,9 +10,7 @@
     →
 
     {% if product.category %}
-        <a href="{% url 'main:category_detail' product.category.id %}">
-            {{ product.category }}
-        </a>
+        <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>
         →
     {% endif %}
 
@@ -35,20 +33,13 @@
 
     <p>Категория:
         {% if product.category %}
-             <a href="{% url 'main:category_detail' product.category.id %}">{{ product.category }}</a>
+             <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>
         {% else %}
             Без категории
         {% endif %}
     </p>
 
-    <p>
-        {% if product.price == 0 %}
-                <strong>Бесплатно</strong>
-            {% else %}
-                <strong>Цена: {{ product.price }} $</strong>
-            {% endif %}
-    </p>
-
+    <p><strong>{{ product.price_label }}</strong></p>
 
     <p>Рейтинг: {% include 'main/includes/product_rating.html' %}</p>
 

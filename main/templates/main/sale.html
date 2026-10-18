@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }} Распродажа - Amazon{% endblock %}
+
+{% block content %}
+
+    <h1 style="text-align: center">Платных товаров на сайте: &nbsp;{{ paid_count }}</h1>
+
+    <br>
+
+    <form method="post" action="{% url 'main:sale' %}">
+        {% csrf_token %}
+        <button type="submit" style="width: 200px; margin-left: 19%">Задействовать скидку 10%</button>
+    </form>
+
+    <br>
+
+{% endblock %}

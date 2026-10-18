@@ -10,42 +10,38 @@
 
     <ul>
         {% for product in products %}
-        <li>
-            {% if product.icon %}
-            <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
-        {% else %}
-            <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
-        {% endif %}
-        <br>
-            <strong><a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a></strong> ({{ product.category }})<br>
-
-            {{ product.description|truncatechars:60 }}<br>
-
-            {% if product.price == 0 %}
-                Этот продукт бесплатный<br>
-                Добавлено: {{ product.created_at | date:"d.m.Y" }}
-                <br><br>
-            {% else %}
-                Цена: {{ product.price }}$<br>
-                Средняя оценка: {% include 'main/includes/product_rating.html' %}<br>
+            <li>
+                {% if product.icon %}
+                    <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+                {% else %}
+                    <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+                {% endif %}
+                    <br>
+                <strong><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></strong> ({{ product.category }})
+                    <br>
+                {{ product.description|truncatechars:60 }}
+                    <br>
+                {{ product.price_label }}
+                    <br>
+                Средняя оценка: {% include 'main/includes/product_rating.html' %}
+                    <br>
                 Продавец: {{ product.seller }}
-                <br>
+                    <br>
                 Автор:
                 {% if product.author %}
                     <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
                 {% else %}
                     Не указан
                 {% endif %}
-                <br><br>
-            {% endif %}
+                    <br><br>
 
-         <form method="post" style="display: inline" action="{% url 'main:add_to_favorites' product.id %}">
-            {% csrf_token %}
-             <input type="hidden" name="next" value="{% url 'main:favorites' %}">
-                <button type="submit" style="width: 190px; height: 50px">Удалить из избранных</button>
-        </form>
+                <form method="post" style="display: inline" action="{% url 'main:add_to_favorites' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'main:favorites' %}">
+                    <button type="submit" style="width: 190px; height: 50px">Удалить из избранных</button>
+                </form>
 
-        </li>
+            </li>
 
         {% empty %}
             <li>В избранные вы пока ничего не добавили</li>

@@ -204,11 +204,7 @@ class ProductDetailView(DetailView):
         product = self.object
 
         if product_name != product.name:
-            return redirect(
-                'main:product_detail',
-                product.id,
-                product.name
-            )
+            return redirect(product.get_absolute_url())
 
         recently_viewed = request.session.get('recently_viewed', [])
         if product.id in recently_viewed:
@@ -264,7 +260,7 @@ def add_review(request, product_id):
         review.product = product
         review.save()
         messages.success(request, 'Спасибо, ваш отзыв добавлен!')
-        return redirect('main:product_detail', product.id, product.name)
+        return redirect(product.get_absolute_url())
 
     if request.user.is_authenticated and 'username' in form.fields:
         form.fields.pop('username')
@@ -338,7 +334,8 @@ def api_product_detail(request, product_id):
         'id': product.id,
         'name': product.name,
         'description': product.description,
-        'price': product.price
+        'price': product.price,
+        'url': request.build_absolute_uri(product.get_absolute_url()),
     }
     return JsonResponse(data)
 
@@ -382,11 +379,7 @@ class AddProductView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('main:product_detail',kwargs={
-            'product_id': self.object.id,
-            'product_name': self.object.name,
-        }
-        )
+        return self.object.get_absolute_url()
 
 def register(request):
     if request.user.is_authenticated:
@@ -436,14 +429,14 @@ def edit_product(request, product_id):
             or product.author_id == request.user.id
     ):
         messages.error(request, 'Редактировать карту продукта может только автор')
-        return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+        return redirect(product.get_absolute_url())
 
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             messages.success(request, f"Карта товара {product.name} обновлена успешно!")
-            return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+            return redirect(product.get_absolute_url())
     else:
         form = ProductForm(instance=product)
     return render(request, 'main/edit_product.html', {
@@ -457,7 +450,7 @@ def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if product.author_id != request.user.id:
         messages.error(request, 'Удалять товар может только его автор')
-        return redirect('main:product_detail', product_id=product.id, product_name=product.name)
+        return redirect(product.get_absolute_url())
 
     product.delete()
     messages.success(request, 'Товар удален успешно!')
@@ -509,10 +502,12 @@ class StorePasswordChangeView(PasswordChangeView):
 class StorePasswordChangeDoneView(TemplateView):
     template_name = 'main/password_change_done.html'
 
+
 @login_required()
 def favorites(request):
     products = request.user.favorite_products.select_related('category', 'author').order_by('name')
     return render(request, 'main/favorites.html', {'products': products})
+
 
 @require_POST
 def add_to_favorites(request, product_id):
@@ -520,10 +515,7 @@ def add_to_favorites(request, product_id):
 
     if not request.user.is_authenticated:
         login_url = reverse('main:login')
-        next_url = reverse(
-            'main:product_detail',
-            args=[product.id, product.name]
-        )
+        next_url = product.get_absolute_url()
         return redirect(f'{login_url}?next={next_url}')
 
     if product.favorited_by.filter(pk=request.user.pk).exists():
@@ -544,11 +536,7 @@ def add_to_favorites(request, product_id):
     if next_url:
         return redirect(next_url)
 
-    return redirect(
-        'main:product_detail',
-        product_id=product.id,
-        product_name=product.name
-    )
+    return redirect(product.get_absolute_url())
 
 
 def site_access(request):
@@ -582,3 +570,18 @@ def site_access(request):
         'main/site_access.html',
         {'error': error},
     )
+
+@login_required
+def sale(request):
+
+    if not request.user.is_staff:
+        messages.error(request, 'Распродажу может инициировать только персонал!')
+        return redirect('main:index')
+
+    if request.method == 'POST':
+        updated = Product.discounted_price(10)
+        messages.success(request, f'Скидка 10% применена к следующим товарам: {updated}')
+        return redirect('main:index')
+
+    paid_count = Product.objects.filter(price__gt=0).count()
+    return render(request, 'main/sale.html', {'paid_count': paid_count})

@@ -24,8 +24,9 @@
                 <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
             {% endif %}
             <br>
-            <strong><a href="{% url 'main:product_detail' expensive.id expensive.name%}">{{ expensive.name }}</a></strong> -
-            Цена: {{ expensive.price }} $
+            <strong><a href="{{ expensive.get_absolute_url }}">{{ expensive.name }}</a></strong>
+            <br>
+            {{ expensive.price_label }}<br>
         </li>
     {% endif %}
 
@@ -47,8 +48,9 @@
                 <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
             {% endif %}
             <br>
-            <strong><a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a></strong> -
-            {% if product.price == 0 %}Бесплатно{% else %}{{ product.price }} ${% endif %}
+            <strong><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></strong>
+            <br>
+            {{ product.price_label }}<br>
         </li>
     {% empty %}
         {% if q %}

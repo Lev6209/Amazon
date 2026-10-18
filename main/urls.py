@@ -40,8 +40,6 @@ urlpatterns = [
     path('reset/complete/', views.StorePasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('password-change/', views.StorePasswordChangeView.as_view(), name='password_change'),
     path('password-change/done/', views.StorePasswordChangeDoneView.as_view(), name='password_change_done'),
-
-
-
+    path('sale/', views.sale, name='sale'),
 
 ]

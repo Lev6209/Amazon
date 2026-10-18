@@ -2,7 +2,7 @@
     <h2>Список категорий:</h2>
         <li>
             {% for category in categories %}
-                    <a href="{% url 'main:category_detail' category.id %}"
+                    <a href="{{ category.get_absolute_url }}"
                        {% if request.resolver_match.url_name == 'category_detail' and request.resolver_match.kwargs.category_id == category.id %}
                            class="active"
                        {% endif %}>

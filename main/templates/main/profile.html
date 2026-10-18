@@ -25,10 +25,10 @@
                 <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
             {% endif %}
             <br>
-            <a href="{% url 'main:product_detail' product.id product.name %}">{{ product.name }}</a><br>
+            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a><br>
             Категория:&nbsp; {{ product.category }}<br>
             Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}<br>
-            Цена:&nbsp; {{ product.price }}$<br>
+            {{ product.price_label }}<br>
             Продавец:&nbsp; {{ product.seller }}<br>
             Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' %}<br><br>
             <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
@@ -56,7 +56,7 @@
 
     {% for review in reviews %}
         <li>
-            Товар:&nbsp;&nbsp;<a href="{% url 'main:product_detail' review.product.id review.product.name %}">{{ review.product.name }}</a><br>
+            Товар:&nbsp;&nbsp;<a href="{{ review.product.get_absolute_url }}">{{ review.product.name }}</a><br>
             Ваша оценка:&nbsp;&nbsp;{{ review.stars }}<br>
             {% if review.comment %}
                 Ваш комментарий:&nbsp;&nbsp;{{ review.comment }}

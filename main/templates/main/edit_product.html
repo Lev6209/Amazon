@@ -16,7 +16,7 @@
         <button type="submit" style="width: 200px; margin-left: 19%">Применить изменения</button>
     </form>
 
-    <p><a href="{% url 'main:product_detail' product.id product.name %}">Назад к карточке продукта</a> </p>
+    <p><a href="{{ product.get_absolute_url }}">Назад к карточке продукта</a> </p>
 
     <br>
 

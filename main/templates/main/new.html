@@ -16,13 +16,9 @@
                 <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
             {% endif %}
             <br>
-            <a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a><br>
-                Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
-            {% if product.price == 0 %}
-                Этот продукт бесплатный
-            {% else %}
-                Цена: {{ product.price }} $
-            {% endif %}
+            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a><br>
+            {{ product.price_label }}<br>
+            Добавлено: {{ product.created_at|date:"d.m.Y" }}<br>
             <br>
         </li>
     {% empty %}

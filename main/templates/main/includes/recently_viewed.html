@@ -25,7 +25,7 @@
 
             <div class="recently-viewed-title">
                 <strong>
-                    <a href="{% url 'main:product_detail' recent_product.id recent_product.name %}">
+                    <a href="{{ recent_product.get_absolute_url }}">
                         {{ recent_product.name }}
                     </a>
                 </strong>
@@ -35,13 +35,7 @@
                     Категория: {{ recent_product.category }}
                 </p>
 
-                <p>
-                    {% if recent_product.price == 0 %}
-                        <strong>Бесплатно</strong>
-                    {% else %}
-                        <strong>Цена: {{ recent_product.price }} $</strong>
-                    {% endif %}
-                </p>
+                <strong>{{ recent_product.price_label }}</strong>
 
                 <p>
                     Рейтинг:

@@ -21,9 +21,9 @@
             <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
         {% endif %}
         <br>
-        <strong><a href="{% url 'main:product_detail' daily_product.id daily_product.name%}">{{ daily_product.name }}</a></strong>
+        <strong><a href="{{ daily_product.get_absolute_url }}">{{ daily_product.name }}</a></strong>
             ({{ daily_product.category }})<br>
-            Цена: {{ daily_product.price }}$<br>
+            {{ daily_product.price_label }}<br>
             Рейтинг: {% include 'main/includes/product_rating.html' with product=daily_product %}
     </li>
 
@@ -52,46 +52,30 @@
         {% for product in page_obj %}
         <li>
             {% if product.icon %}
-            <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
-        {% else %}
-            <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
-        {% endif %}
-        <br>
-            <strong><a href="{% url 'main:product_detail' product.id product.name%}">{{ product.name }}</a></strong> ({{ product.category }})<br>
+                <img src="{{ product.icon.url }}" alt="{{ product.name }}" class="product-icon-sm">
+            {% else %}
+                <img src="{% static 'main/images/placeholder.png' %}" alt="Нет изображения" class="product-icon-sm">
+            {% endif %}
+            <br>
+            <strong><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></strong> ({{ product.category }})<br>
 
             {{ product.description|truncatechars:60 }}<br>
+            {{ product.price_label }}<br>
 
-            {% if product.price == 0 %}
-                Этот продукт бесплатный<br>
-                Рейтинг: {% include 'main/includes/product_rating.html' %}
-                <br>
-                Продавец: {{ product.seller }}
-                <br>
-                Автор:
-                {% if product.author %}
-                    <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
-                {% else %}
-                    Не указан
-                {% endif %}
-                <br>
-                Добавлено: {{ product.created_at | date:"d.m.Y" }}
-                <br><br>
+            Рейтинг: {% include 'main/includes/product_rating.html' %}
+            <br>
+            Продавец: {{ product.seller }}
+            <br>
+            Автор:
+            {% if product.author %}
+                <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
             {% else %}
-                Цена: {{ product.price }}$<br>
-                Рейтинг: {% include 'main/includes/product_rating.html' %}
-                <br>
-                Продавец: {{ product.seller }}
-                <br>
-                Автор:
-                {% if product.author %}
-                    <a href="{% url 'main:author_detail' product.author.id %}">{{ product.author.username }}</a>
-                {% else %}
-                    Не указан
-                {% endif %}
-                <br>
-                Добавлено: {{ product.created_at | date:"d.m.Y" }}
-                <br><br>
+                Не указан
             {% endif %}
+            <br>
+            Добавлено: {{ product.created_at | date:"d.m.Y" }}
+            <br><br>
+
         </li>
 
         {% empty %}
