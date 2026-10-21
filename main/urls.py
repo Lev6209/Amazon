@@ -20,7 +20,7 @@ urlpatterns = [
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
 
     # path('free/', views.free, name='free'),
-    path('new/', views.new, name='new'),
+    path('new/', views.NewProductView.as_view(), name='new'),
     path('api/product/<int:product_id>/', views.api_product_detail, name='api_product_detail'),
     path('free_products/', views.IndexView.as_view(), {'is_free': True}, name='free_products'),
     path('paid_products/', views.IndexView.as_view(), {'is_free': False}, name='paid_products'),
@@ -41,5 +41,7 @@ urlpatterns = [
     path('password-change/', views.StorePasswordChangeView.as_view(), name='password_change'),
     path('password-change/done/', views.StorePasswordChangeDoneView.as_view(), name='password_change_done'),
     path('sale/', views.sale, name='sale'),
+
+    path('category/<int:category_id>/close/', views.close_category, name='close_category'),
 
 ]

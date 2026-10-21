@@ -28,6 +28,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
 from django.urls import reverse, reverse_lazy
+from requests.packages import target
 
 from .models import Product
 from .models import Review
@@ -105,9 +106,9 @@ class IndexView(ListView):
         is_free = self.kwargs.get('is_free')
 
         if is_free is True:
-            products = Product.objects.filter(price=0)
+            products = Product.objects.free()
         elif is_free is False:
-            products = Product.objects.filter(price__gt=0)
+            products = Product.objects.paid()
         else:
             products = Product.objects.all()
 
@@ -314,18 +315,27 @@ def review(request):
 #     products = Product.objects.filter(price=0)
 #     return render(request, 'main/free.html', {'products': products})
 
-@require_GET
-def new(request):
-    products = Product.objects.order_by('-created_at')
+# @require_GET
+# def new(request):
+#     products = Product.objects.order_by('-created_at')
+#
+#     paginator = Paginator(products, 3)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#
+#     return render(request, 'main/new.html', {
+#         'products': products,
+#         'page_obj': page_obj
+#     })
 
-    paginator = Paginator(products, 3)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+class NewProductView(ListView):
+    model = Product
+    template_name = 'main/new.html'
+    context_object_name = 'products'
+    paginate_by = 3
 
-    return render(request, 'main/new.html', {
-        'products': products,
-        'page_obj': page_obj
-    })
+    def get_queryset(self):
+        return Product.objects.newest()
 
 @require_GET
 def api_product_detail(request, product_id):
@@ -583,5 +593,35 @@ def sale(request):
         messages.success(request, f'Скидка 10% применена к следующим товарам: {updated}')
         return redirect('main:index')
 
-    paid_count = Product.objects.filter(price__gt=0).count()
+    paid_count = Product.objects.paid().count()
     return render(request, 'main/sale.html', {'paid_count': paid_count})
+
+
+@login_required()
+def close_category(request, category_id):
+    source = get_object_or_404(Category, id=category_id)
+    if not request.user.is_staff:
+        messages.error(request, 'Закрыть категорию может только сотрудник Amazon')
+        return redirect('main:index')
+
+    targets = Category.objects.exclude(pk=source.pk).order_by('name')
+    if request.method == 'POST':
+        raw_target = request.POST.get('target_id', '')
+        if not str(raw_target).isdigit():
+            messages.error(request, 'Выберите целевую категорию для переноса товаров')
+            return redirect('main:close_category', category_id=source.pk)
+        target = get_object_or_404(Category, pk=int(raw_target))
+        try:
+            moved = Product.objects.move_to_category(source, target)
+        except ValueError as exc:
+            messages.error(request, str(exc))
+            return redirect('main:close_category', category_id=source.pk)
+        messages.success(request, f'Категория закрыта. Перенесено {moved} товаров ')
+        return redirect('main:category_detail', category_id=target.pk)
+
+    products_count = Product.objects.in_category(source).count()
+    return render(request, 'main/close_category.html', {
+        'source': source,
+        'targets': targets,
+        'products_count': products_count,
+    })

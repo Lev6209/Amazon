@@ -1,7 +1,7 @@
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
@@ -24,6 +24,36 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+
+
+
+class ProductQuerySet(models.QuerySet):
+    def free(self):
+        return self.filter(price=0)
+
+    def paid(self):
+        return self.filter(price__gt=0)
+
+    def cheap(self):
+        return self.paid().filter(price__lt=100).order_by('price')
+
+    def newest(self):
+        return self.order_by('-created_at')
+
+    def in_category(self, category):
+        return self.filter(category=category)
+
+
+class ProductManager(models.Manager.from_queryset(ProductQuerySet)):
+    def move_to_category(self, source, target):
+        if source.pk is None or target.pk is None or source.pk == target.pk:
+            raise ValueError('Нельзя перенести продукт в ту же категорию')
+        with transaction.atomic():
+            moved = self.model.objects.in_category(source).update(category=target)
+            source.delete()
+        return moved
+
+
 
 class Seller(models.Model):
     name = models.CharField(max_length=100)
@@ -51,6 +81,7 @@ class Product(models.Model):
     icon = models.ImageField(upload_to=product_icon_path, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     favorited_by = models.ManyToManyField(User, related_name='favorite_products', blank=True, verbose_name='В избранном у')
+    objects = ProductManager()
 
     def __str__(self):
         return self.name
@@ -69,7 +100,7 @@ class Product(models.Model):
         if type(percent) is not int or not 1 <= percent <= 90:
             raise ValueError('Скидка должна быть целым числом от 1 до 90 %')
         factor = (Decimal(100) - Decimal(percent)) / Decimal(100)
-        discounted_products = list(cls.objects.filter(price__gt=0))
+        discounted_products = list(cls.objects.paid())
         for product in discounted_products:
             product.price = (product.price * factor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         return cls.objects.bulk_update(discounted_products, ['price'])

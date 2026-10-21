@@ -1,5 +1,6 @@
 from decimal import Decimal, ROUND_HALF_UP
 
+from django.db import transaction
 from django.db.models import Avg, Count
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -24,6 +25,7 @@ def refresh_product_rating(product_id):
     )
 
 
+
 @receiver(post_save, sender=Review, dispatch_uid='main.review_saved_refresh_rating')
 def review_saved(sender, instance, created, **kwargs):
     refresh_product_rating(instance.product_id)
@@ -33,18 +35,21 @@ def review_saved(sender, instance, created, **kwargs):
         author = product.author
 
         if author and author.email:
-            send_mail(
-                subject=f'Новый отзыв на товар «{product.name}»',
-                message=(
-                    f'На ваш товар «{product.name}» оставлен новый отзыв.\n\n'
-                    f'Автор отзыва: {instance.username}\n'
-                    f'Оценка: {instance.stars} из 5\n\n'
-                    f'Комментарий:\n{instance.comment}'
-                ),
-                from_email=None,
-                recipient_list=[author.email],
-                fail_silently=True,
-            )
+            def send_review_email():
+                send_mail(
+                    subject=f'Новый отзыв на товар «{product.name}»',
+                    message=(
+                        f'На ваш товар «{product.name}» оставлен новый отзыв.\n\n'
+                        f'Автор отзыва: {instance.username}\n'
+                        f'Оценка: {instance.stars} из 5\n\n'
+                        f'Комментарий:\n{instance.comment}'
+                    ),
+                    from_email=None,
+                    recipient_list=[author.email],
+                    fail_silently=True,
+                )
+
+            transaction.on_commit(send_review_email)
 
 
 @receiver(post_delete, sender=Review, dispatch_uid='main.review_deleted_refresh_rating')
