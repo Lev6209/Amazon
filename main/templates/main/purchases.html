@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }} Мои покупки - Amazon{% endblock %}
+
+{% block content %}
+
+    <h1 style="text-align: center">Мои покупки</h1>
+    <br>
+
+    <ul>
+        {% for purchase in purchases %}
+            <li>
+                <strong><a href="{{ purchase.product.get_absolute_url }}">{{ purchase.product.name }}</a></strong>
+                <br>
+                Дата покупки: {{ purchase.purchased_at|date:"d.m.Y" }};
+                <br>
+                Оплачено: {{ purchase.price_label }};
+                <br>
+                На данный момент: {{ purchase.product.price_label }}
+            </li>
+        {% empty %}
+            <li>Список покупок пуст</li>
+        {% endfor %}
+    </ul>
+
+
+    <p><strong>Всего потрачено: {{ total|floatformat:2 }} $</strong></p>
+    <br>
+
+{% endblock %}

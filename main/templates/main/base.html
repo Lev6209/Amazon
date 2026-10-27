@@ -39,21 +39,24 @@
             class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
             &nbsp;
             <a href="{% url 'main:favorites' %}"
-            class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">Избранное ({{ favorites_count }})</a></a>
+            class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">Избранное ({{ favorites_count }})</a>
             &nbsp;
             {% if user.is_staff %}
                 <a href="{% url 'main:sale' %}">Распродажа</a>
                 &nbsp;
             {% endif %}
 
+            <a href="{% url 'main:purchases' %}"
+            class="{% if request.resolver_match.url_name == 'purchases' %}active{% endif %}">Мои покупки</a>
+
             <a href="{% url 'main:profile' %}"
             class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Профиль</a>
             &nbsp;
-            <span>Приветствуем вас, <strong>{{ user.username }}</strong></span>
+{#            <span>Приветствуем вас, <strong>{{ user.username }}</strong></span>#}
             <form method="post" action="{% url 'main:logout' %}" style="display: inline;">
                 {% csrf_token %}
                 &nbsp;
-                <button type="submit" style="width: 70px; padding: 8px 1px">Выйти</button>
+                <button type="submit" style="width: max-content; max-width: none;padding: 8px 8px; white-space: nowrap;">{{ user.username }} - Выйти</button>
             </form>
         {% else %}
             <a href="{% url 'main:login' %}"

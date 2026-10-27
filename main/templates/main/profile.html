@@ -30,7 +30,9 @@
             Выставлено:&nbsp; {{ product.created_at|date:"d.m.Y H:i" }}<br>
             {{ product.price_label }}<br>
             Продавец:&nbsp; {{ product.seller }}<br>
-            Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' %}<br><br>
+            Средний рейтинг:&nbsp; {% include 'main/includes/product_rating.html' %}<br>
+            Количество покупок: {{ product.purchases_count }}<br>
+            Сумма покупок: {{ product.purchases_total|floatformat:2 }} $<br><br>
             <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 150px">Редактировать</button>
             &nbsp;&nbsp;&nbsp;
             {% if product.author_id == user.id %}

@@ -67,9 +67,13 @@
 
     {% if user.is_authenticated %}
         {% if perms.main.change_product or user.is_staff or product.author_id == user.id %}
-            <button type="button" onclick="window.location.href='{% url 'main:edit_product' product.id %}'" style="width: 190px; height: 50px">Редактировать</button>
+            <button type="button"
+                    onclick="window.location.href='{% url 'main:edit_product' product.id %}'"
+                    style="width: 190px; height: 50px">Редактировать
+            </button>
+            &nbsp;&nbsp;&nbsp;
         {% endif %}
-    &nbsp;&nbsp;&nbsp;
+
         {% if product.author_id == user.id %}
             <form method="post"
                   action="{% url 'main:delete_product' product.id %}"
@@ -77,20 +81,76 @@
                   onsubmit="return confirm('Вы уверены, что хотите удалить этот товар?');">
                 {% csrf_token %}
                 <button type="submit" style="width: 190px; height: 50px">Удалить товар</button>
+                &nbsp;&nbsp;&nbsp;
             </form>
         {% endif %}
-        &nbsp;&nbsp;&nbsp;
+
         <form method="post" style="display: inline" action="{% url 'main:add_to_favorites' product.id %}">
             {% csrf_token %}
             {% if is_favorite %}
                 <button type="submit" style="width: 190px; height: 50px">Удалить из избранных</button>
+                 &nbsp;&nbsp;&nbsp;
             {% else %}
                 <button type="submit" style="width: 190px; height: 50px">Добавить в избранные</button>
+                &nbsp;&nbsp;&nbsp;
             {% endif %}
         </form>
+
     {% else %}
-        <button type="button" onclick="window.location.href='{% url 'main:login' %}?next={{ request.path }}'" style="width: 190px; height: 50px">Войдите</button>
-            <p>Чтобы добавить товар в избранные</p>
+        <button type="button"
+                onclick="window.location.href='{% url 'main:login' %}?next={{ request.path }}'"
+                style="width: 190px; height: 50px">Войдите
+        </button>
+        <h3>Чтобы приобрести товар либо добавить в избранные</h3>
+    {% endif %}
+
+    {% if purchase %}
+    <p><strong>Вы уже приобретали этот товар:</strong></p>
+
+        <ul>
+        {% for item in purchases %}
+            <li>
+                {{ item.purchased_at|date:"d.m.Y H:i" }}
+                — {{ item.price_label }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Хотите приобрести его вновь?</strong></p>
+
+
+    <form method="post"
+          style="display: inline"
+          action="{% url 'main:buy_product' product.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="confirm" value="yes">
+        <button type="submit" style="width: 190px; height: 50px">
+            Приобрести снова
+        </button>
+    </form>
+
+    {% elif user.is_authenticated and product.author_id == user.id %}
+        <h3>Это ваш продукт. Вы действительно хотите его приобрести?</h3>
+
+        <form method="post"
+              style="display: inline"
+              action="{% url 'main:buy_product' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="confirm" value="yes">
+            <button type="submit" style="width: 190px; height: 50px">
+                Всё равно приобрести
+            </button>
+        </form>
+
+    {% elif user.is_authenticated %}
+        <form method="post"
+              style="display: inline"
+              action="{% url 'main:buy_product' product.id %}">
+            {% csrf_token %}
+            <button type="submit" style="width: 190px; height: 50px">
+                Приобрести за {{ product.price }} $
+            </button>
+        </form>
 
     {% endif %}
 

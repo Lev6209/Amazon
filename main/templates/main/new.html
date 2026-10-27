@@ -38,7 +38,7 @@
         {% endif %}
     </p>
 
-    <p>Всего товаров: {{ products|length }}</p>
+    <p>Всего товаров: {{ page_obj.paginator.count }}</p>
 
     {% include 'main/includes/recently_viewed.html' %}
 {% endblock %}

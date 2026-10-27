@@ -16,6 +16,11 @@ urlpatterns = [
     path('favorites/', views.favorites, name='favorites'),
     path('product/<int:product_id>/add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),
 
+
+    path('product/<int:product_id>/buy/', views.buy_product, name='buy_product'),
+    path('purchases/', views.purchases, name='purchases'),
+
+
     path('product/<int:product_id>/<path:product_name>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
 
@@ -43,5 +48,7 @@ urlpatterns = [
     path('sale/', views.sale, name='sale'),
 
     path('category/<int:category_id>/close/', views.close_category, name='close_category'),
+
+
 
 ]

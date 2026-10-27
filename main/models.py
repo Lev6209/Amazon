@@ -6,8 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 
-from datetime import datetime
-
 def validate_non_negative_price(value):
     if value <0:
        raise ValidationError('Цена не может быть меньше нуля')
@@ -74,13 +72,30 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0, validators=[validate_non_negative_price])
     created_at = models.DateTimeField(auto_now_add=True)
-    rating_avg = models.DecimalField(max_digits=2, decimal_places=1, default=0, editable=False, verbose_name="Средняя оценка")
-    rating_count = models.PositiveIntegerField(default=0, editable=False,verbose_name="Количество оценок")
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
     icon = models.ImageField(upload_to=product_icon_path, blank=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     favorited_by = models.ManyToManyField(User, related_name='favorite_products', blank=True, verbose_name='В избранном у')
+    rating_avg = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        default=0,
+        editable=False,
+        verbose_name="Средняя оценка"
+    )
+    rating_count = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+        verbose_name="Количество оценок"
+    )
+    buyers = models.ManyToManyField(
+        User,
+        through='Purchase',
+        related_name='purchased_products',
+        verbose_name='Приобрели'
+    )
+
     objects = ProductManager()
 
     def __str__(self):
@@ -93,6 +108,11 @@ class Product(models.Model):
         if self.price == 0:
             return "Бесплатный товар"
         return f'Цена: {self.price} $'
+
+    def purchase_of(self, user):
+        if not user.is_authenticated:
+            return None
+        return self.purchases.filter(user=user).order_by('-purchased_at').first()
 
 
     @classmethod
@@ -130,3 +150,32 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+
+
+
+class Purchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='purchases')
+    price_paid = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        validators=[validate_non_negative_price],
+        verbose_name='Заплачено'
+    )
+    purchased_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата покупки')
+
+    class Meta:
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+
+
+    def __str__(self):
+        return f'{self.user} - {self.product}'
+
+    def price_label(self):
+        if self.price_paid == 0:
+            return "Бесплатно"
+        return f'{self.price_paid} $'
+
+
+

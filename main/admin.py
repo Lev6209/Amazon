@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Seller, Category, Product, Review
+from .models import Seller, Category, Product, Review, Purchase
 
 admin.site.register(Seller)
 admin.site.register(Category)
@@ -17,3 +17,9 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
     list_filter = ('category', 'seller')
     filter_horizontal = ('favorited_by',)
+
+
+@admin.register(Purchase)
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'price_paid', 'purchased_at')
+    list_filter = ('product', 'user')

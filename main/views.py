@@ -1,10 +1,11 @@
-from itertools import product
 from pyclbr import Class
 import os
 import secrets
 
+from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Sum, Count, Value
+from django.db.models.functions import Coalesce
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
@@ -30,11 +31,11 @@ from django.contrib.auth.models import User
 from django.urls import reverse, reverse_lazy
 from requests.packages import target
 
-from .models import Product
-from .models import Review
-from .models import Category
-
 from .forms import ReviewForm, ProductForm, RegisterForm
+
+from .models import Product, Review, Category, Purchase
+
+
 
 
 
@@ -245,6 +246,15 @@ class ProductDetailView(DetailView):
         )
         context['recently_viewed'] = recently_viewed
 
+        context['purchase'] = self.object.purchase_of(self.request.user)
+
+        if self.request.user.is_authenticated:
+            context['purchases'] = self.object.purchases.filter(
+                user=self.request.user
+            ).order_by('-purchased_at')
+        else:
+            context['purchases'] = []
+
         return context
 
 
@@ -267,11 +277,20 @@ def add_review(request, product_id):
         form.fields.pop('username')
     reviews = product.review_set.order_by('-created_at')
 
+    if request.user.is_authenticated:
+        purchases = product.purchases.filter(
+            user=request.user
+        ).order_by('-purchased_at')
+    else:
+        purchases = []
+
     return render(request, 'main/product_detail.html', {
         'product': product,
         'form': form,
         'reviews': reviews,
-        'is_favorite': request.user.is_authenticated and product.favorited_by.filter(pk=request.user.pk).exists()
+        'is_favorite': request.user.is_authenticated and product.favorited_by.filter(pk=request.user.pk).exists(),
+        'purchase': product.purchase_of(request.user),
+        'purchases': purchases,
     })
 
 
@@ -279,7 +298,7 @@ def add_review(request, product_id):
 def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     q = request.GET.get('q', '')
-    products = Product.objects.filter(category=category)
+    products = Product.objects.filter(category=category).defer('description')
 
     if q:
         products = products.filter(Q(name__icontains=q)|Q(description__icontains=q))
@@ -335,7 +354,7 @@ class NewProductView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        return Product.objects.newest()
+        return Product.objects.newest().defer('description')
 
 @require_GET
 def api_product_detail(request, product_id):
@@ -423,7 +442,15 @@ class StoreLogoutView(LogoutView):
 def profile(request):
     reviews = Review.objects.filter(username=request.user.username).order_by('-created_at')
 
-    products = Product.objects.filter(author=request.user).order_by('-created_at')
+    products = (Product.objects.filter(author=request.user).annotate(
+            purchases_count=Count('purchases'),
+            purchases_total=Coalesce(
+                Sum('purchases__price_paid'),
+                Value(Decimal('0.00'))
+            )
+        )
+        .order_by('-created_at')
+    )
 
     return render(request, 'main/profile.html', {
         'reviews': reviews,
@@ -468,8 +495,9 @@ def delete_product(request, product_id):
 
 def author_detail(request, user_id):
     author = get_object_or_404(User, id=user_id)
-    products = Product.objects.filter(author=author).order_by('-created_at')
 
+    products = Product.objects.filter(author=author).order_by('-created_at')
+    
     return render(request, 'main/author_detail.html', {
         'author': author,
         'products': products
@@ -624,4 +652,49 @@ def close_category(request, category_id):
         'source': source,
         'targets': targets,
         'products_count': products_count,
+    })
+
+
+@require_POST
+def buy_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if not request.user.is_authenticated:
+        login_url = reverse('main:login')
+        return redirect(f'{login_url}?next={product.get_absolute_url()}')
+
+    previous_purchase = product.purchase_of(request.user)
+    needs_confirmation = (
+        product.author_id == request.user.id
+        or previous_purchase is not None
+    )
+
+    if needs_confirmation and request.POST.get('confirm') != 'yes':
+        return redirect(product.get_absolute_url())
+
+    Purchase.objects.create(
+        user=request.user,
+        product=product,
+        price_paid=product.price,
+    )
+
+    messages.success(
+        request,
+        f'Покупка оформлена: {product.name}, {product.price_label()}'
+    )
+
+    return redirect(product.get_absolute_url())
+
+@login_required
+def purchases(request):
+    items = (
+        Purchase.objects.filter(user=request.user)
+        .select_related('product')
+        .only('price_paid', 'purchased_at', 'product__name', 'product__price')
+        .order_by('-purchased_at')
+    )
+    total = items.aggregate(total=Sum('price_paid'))['total'] or 0
+    return render(request, 'main/purchases.html', {
+        'purchases': items,
+        'total': total
     })
