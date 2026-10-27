@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}{{ product.name }}{% endblock %}
@@ -211,7 +213,7 @@
          <li>
             <div>
                 <p><strong>{{ review.username }}</strong></p>
-                <p>Оценка: {{ review.stars }}</p>
+                <p>Оценка: {{ review.stars|hearts }}</p>
                 <span>Комментарий: </span>
                     {% if review.comment %}
                             {{ review.comment }}
@@ -231,7 +233,7 @@
     {% endfor %}
 
     <hr>
-    <p>Всего отзывов: {{ product.rating_count }}</p>
+    <p>Всего: {{ product.rating_count|reviews_count }}</p>
 
     {% include 'main/includes/recently_viewed.html' %}
 

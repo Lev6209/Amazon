@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}{{ title }} - Amazon{% endblock %}
@@ -50,7 +52,7 @@
         <p>Товаров от вашего имени пока нет.</p>
         <hr>
     {% endfor %}
-    <p>Всего товаров: {{ products.count }}</p>
+    <p>Всего: {{ products.count|products_count }}</p>
     <br>
     <br>
 
@@ -69,6 +71,6 @@
     {% empty %}
         <p>Вы пока не оставляли отзывов.</p>
     {% endfor %}
-    <p>Всего отзывов: {{ reviews.count }}</p>
+    <p>Всего: {{ reviews.count|reviews_count }}</p>
 
 {% endblock %}

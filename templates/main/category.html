@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}{{ category.name}} - Amazon{% endblock %}
@@ -77,5 +79,5 @@
         {% endif %}
     </p>
 
-    <p>Товаров в этой категории: {{ products|length }}</p>
+    <p>В этой категории {{ products|length|products_count }}</p>
 {% endblock %}

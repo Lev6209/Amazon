@@ -1,4 +1,5 @@
 {% load static %}
+{% load store_tags %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -94,7 +95,7 @@
     <br>
     <br>
     <hr>
-    <footer>Всего на сайте: {{ categories_total}} категорий и {{ products_total }} товаров</footer>
+    <footer>Всего на сайте: {{ categories_total|categories_count}} и {{ products_total|products_count }}</footer>
 
 </body>
 </html>

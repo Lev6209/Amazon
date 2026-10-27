@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}Новинки — Amazon{% endblock %}
@@ -38,7 +40,7 @@
         {% endif %}
     </p>
 
-    <p>Всего товаров: {{ page_obj.paginator.count }}</p>
+    <p>Всего: {{ page_obj.paginator.count|products_count }}</p>
 
     {% include 'main/includes/recently_viewed.html' %}
 {% endblock %}

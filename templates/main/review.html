@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}Отзывы покупателей{% endblock %}
@@ -13,7 +15,7 @@
         <li>
             <strong>{{ review.username }}</strong><br>
             Продукт: <strong><a href="{{ review.product.get_absolute_url }}">{{ review.product.name }}</a></strong><br>
-            Оценка: {{ review.stars }} ⭐<br>
+            Оценка: {{ review.stars|hearts }}<br>
             Отзыв:
                 {% if review.comment %}
                     {{ review.comment }}
@@ -32,7 +34,7 @@
         <li>Отзывов не найдено</li>
     {% endfor %}
 </ul>
-<p>Всего отзывов: {{ reviews.count }}</p>
+<p>Всего: {{ reviews.count|reviews_count }}</p>
 {% endblock %}
 
 

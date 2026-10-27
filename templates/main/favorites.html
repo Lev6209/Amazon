@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}{{ title }}Избранные - Amazon{% endblock %}
@@ -69,7 +71,7 @@
     </p>
 {% endif %}
 
-    <p>Всего товаров: {{ products|length }}</p>
+    <p>Всего: {{ products|length|products_count }}</p>
 
     {% include 'main/includes/recently_viewed.html' %}
 

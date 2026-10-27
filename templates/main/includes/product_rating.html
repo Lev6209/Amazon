@@ -1,3 +1,5 @@
+{% load store_tags %}
+
 {#{% if average_rating %}#}
 {#    {{ average_rating|floatformat:1 }}⭐️#}
 {#{% else %}#}
@@ -5,7 +7,7 @@
 {#{% endif %}#}
 
 {% if product.rating_count %}
-    {{ product.rating_avg }}⭐️ из 5 (отзывов: {{ product.rating_count }})
+    {{ product.rating_avg|hearts }} {{ product.rating_avg }} ({{ product.rating_count|reviews_count }})
 {% else %}
     Оценок пока нет
 {% endif %}
