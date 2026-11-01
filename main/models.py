@@ -1,5 +1,7 @@
+from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 
+from django.utils.html import format_html
 from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.core.exceptions import ValidationError
@@ -71,6 +73,14 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0, validators=[validate_non_negative_price])
+    price_before_sale = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name='Цена до распродажи'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
@@ -105,8 +115,17 @@ class Product(models.Model):
         return reverse('main:product_detail', kwargs={'product_id': self.pk, 'product_name': self.name})
 
     def price_label(self):
+
         if self.price == 0:
             return "Бесплатный товар"
+
+        if self.price_before_sale is not None:
+            return format_html(
+                'Цена со скидкой: &nbsp; <span style="color: red; font-size: 24px;">{} $</span> &nbsp; <s>{} $</s>',
+                self.price,
+                self.price_before_sale,
+            )
+
         return f'Цена: {self.price} $'
 
     def purchase_of(self, user):
@@ -122,8 +141,18 @@ class Product(models.Model):
         factor = (Decimal(100) - Decimal(percent)) / Decimal(100)
         discounted_products = list(cls.objects.paid())
         for product in discounted_products:
+            if product.price_before_sale is None:
+                product.price_before_sale = product.price
             product.price = (product.price * factor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        return cls.objects.bulk_update(discounted_products, ['price'])
+        return cls.objects.bulk_update(discounted_products, ['price', 'price_before_sale'])
+
+
+    @classmethod
+    def end_sale(cls):
+        return cls.objects.filter(price_before_sale__isnull=False).update(
+            price=models.F('price_before_sale'),
+            price_before_sale=None,
+        )
 
 
     class Meta:

@@ -168,3 +168,75 @@ form input[type="checkbox"] {
 .recently-viewed-title {
     margin-bottom: 8px;
 }
+
+
+.price-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.price-filter > .errorlist {
+    flex-basis: 100%;
+}
+
+.price-filter > .errorlist li {
+    font-size: 20px;
+    margin-left: 0;
+}
+
+
+.price-filter p {
+    margin: 0;
+}
+
+.price-filter input {
+    width: 40px;
+    margin-bottom: 0;
+    font-size: 16px;
+}
+
+.price-filter select {
+    width: 130px;
+    height: 35px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.price-filter label {
+    width: auto;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+.date-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-filter p {
+    margin: 0;
+}
+
+.date-filter input {
+    width: 180px;
+    margin-bottom: 0;
+}
+
+.date-filter label {
+    width: auto;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+.date-filter > .errorlist {
+    flex-basis: 100%;
+}
+
+.date-filter > .errorlist li {
+    font-size: 20px;
+    margin-left: 0;
+}

@@ -50,3 +50,22 @@ def products_count(value):
         word = 'товаров'
 
     return f'{value} {word}'
+
+@register.filter
+def sale_count(value):
+    value = int(value)
+
+    if 11 <= value % 100 <= 14:
+        word = 'товарам'
+    elif value % 10 == 1:
+        word = 'товару'
+    elif 2 <= value % 10 <= 4:
+        word = 'товарам'
+    else:
+        word = 'товарам'
+
+    return f'{value} {word}'
+
+
+
+

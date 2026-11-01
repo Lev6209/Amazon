@@ -19,6 +19,13 @@
         <button type="submit">Найти</button>
     </form>
     <br>
+
+    <form method="get" class="price-filter">
+        {{ form.as_p }}
+        <button type="submit" style="width: auto">Подобрать</button>
+    </form>
+
+    <br>
     <br>
 
     {% if expensive %}

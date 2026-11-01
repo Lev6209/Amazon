@@ -9,6 +9,12 @@
     <h1 style="text-align: center">Мои покупки</h1>
     <br>
 
+    <form method="get" class="date-filter">
+        {{ form.as_p }}
+        <button type="submit" style="width: auto">Подобрать</button>
+    </form>
+    <br>
+
     <ul>
         {% for purchase in purchases %}
             <li>

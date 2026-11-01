@@ -61,8 +61,10 @@
             <br>
             <strong><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></strong> ({{ product.category }})<br>
 
-            {{ product.description|truncatechars:60 }}<br>
-            {{ product.price_label }}<br>
+            {{ product.description|truncatechars:60 }}
+            <br>
+            {{ product.price_label }}
+            <br>
 
             Рейтинг: {% include 'main/includes/product_rating.html' %}
             <br>

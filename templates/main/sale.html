@@ -1,20 +1,37 @@
 {% extends 'main/base.html' %}
 
+{% load store_tags %}
+
 {% load static %}
 
 {% block title %}{{ title }} Распродажа - Amazon{% endblock %}
 
 {% block content %}
 
-    <h1 style="text-align: center">Платных товаров на сайте: &nbsp;{{ paid_count }}</h1>
+    <h1 style="text-align: center">На данный момент на сайте&nbsp;{{ paid_count|products_count }} с ценой выше 0$</h1>
 
     <br>
 
     <form method="post" action="{% url 'main:sale' %}">
         {% csrf_token %}
-        <button type="submit" style="width: 200px; margin-left: 19%">Задействовать скидку 10%</button>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-right: 7%">
+            <label for="discount">Размер скидки:</label>
+            <input type="number" id="discount" name="discount"
+                   min="1" max="90" value="0" required
+                   style="width: 30px;">
+            <span>%</span>
+        </div>
+    <br>
+    <button type="submit" style="width: 200px; display: flex; justify-content: center; margin: auto">Задействовать скидку</button>
     </form>
 
+    <br>
+    <br>
+
+    <form method="post" action="{% url 'main:sale' %}">
+        {% csrf_token %}
+        <button type="submit" name="end_sale" style="width: 200px; display: flex; justify-content: center; margin: auto">Завершить распродажу</button>
+    </form>
     <br>
 
 {% endblock %}

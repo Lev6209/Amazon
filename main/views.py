@@ -1,4 +1,5 @@
 from pyclbr import Class
+
 import os
 import secrets
 
@@ -31,8 +32,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse, reverse_lazy
 from requests.packages import target
 
-from .forms import ReviewForm, ProductForm, RegisterForm
-
+from .forms import ReviewForm, ProductForm, RegisterForm, PriceFilterForm, DateFilterForm
+from .templatetags.store_tags import sale_count, products_count
 from .models import Product, Review, Category, Purchase
 
 
@@ -299,6 +300,17 @@ def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     q = request.GET.get('q', '')
     products = Product.objects.filter(category=category).defer('description')
+    form = PriceFilterForm(request.GET)
+
+    if form.is_valid():
+        price_min = form.cleaned_data['price_min']
+        price_max = form.cleaned_data['price_max']
+        if price_min is not None:
+            products = products.filter(price__gte=price_min)
+        if price_max is not None:
+            products = products.filter(price__lte=price_max)
+        if form.cleaned_data['sort']:
+            products = products.order_by(form.cleaned_data['sort'])
 
     if q:
         products = products.filter(Q(name__icontains=q)|Q(description__icontains=q))
@@ -320,7 +332,8 @@ def category_detail(request, category_id):
         'page_obj': page_obj,
         'category': category,
         'products': products,
-        'expensive': expensive
+        'expensive': expensive,
+        'form': form,
     })
 
 
@@ -497,7 +510,7 @@ def author_detail(request, user_id):
     author = get_object_or_404(User, id=user_id)
 
     products = Product.objects.filter(author=author).order_by('-created_at')
-    
+
     return render(request, 'main/author_detail.html', {
         'author': author,
         'products': products
@@ -617,8 +630,23 @@ def sale(request):
         return redirect('main:index')
 
     if request.method == 'POST':
-        updated = Product.discounted_price(10)
-        messages.success(request, f'Скидка 10% применена к следующим товарам: {updated}')
+        if 'end_sale' in request.POST:
+            restored = Product.end_sale()
+            messages.success(request, f'Распродажа завершена и цены возвращены у {products_count(restored)}')
+            return redirect('main:index')
+
+        try:
+            sale_index = int(request.POST.get('discount', 0))
+            updated = Product.discounted_price(sale_index)
+
+        except ValueError as error:
+            messages.error(request, str(error))
+            return redirect('main:sale')
+
+        messages.success(
+            request,
+            f'Скидка {sale_index}% применена к {sale_count(updated)}'
+        )
         return redirect('main:index')
 
     paid_count = Product.objects.paid().count()
@@ -687,14 +715,35 @@ def buy_product(request, product_id):
 
 @login_required
 def purchases(request):
+    form = DateFilterForm(request.GET)
     items = (
         Purchase.objects.filter(user=request.user)
         .select_related('product')
         .only('price_paid', 'purchased_at', 'product__name', 'product__price')
         .order_by('-purchased_at')
     )
+
+    if form.is_valid():
+        date_min = form.cleaned_data['date_min']
+        date_max = form.cleaned_data['date_max']
+        contains = form.cleaned_data['contains']
+
+        if date_min is not None:
+            items = items.filter(purchased_at__date__gte=date_min)
+
+        if date_max is not None:
+            items = items.filter(purchased_at__date__lte=date_max)
+
+        if contains:
+            items = items.filter(
+                Q(product__name__icontains=contains) |
+                Q(product__category__name__icontains=contains)
+            )
+
     total = items.aggregate(total=Sum('price_paid'))['total'] or 0
+
     return render(request, 'main/purchases.html', {
         'purchases': items,
-        'total': total
+        'total': total,
+        'form': form,
     })
