@@ -66,6 +66,19 @@ def sale_count(value):
 
     return f'{value} {word}'
 
+@register.filter
+def end_sale_count(value):
+    value = int(value)
 
+    if 11 <= value % 100 <= 14:
+        word = 'товаров'
+    elif value % 10 == 1:
+        word = 'товара'
+    elif 2 <= value % 10 <= 4:
+        word = 'товаров'
+    else:
+        word = 'товаров'
+
+    return f'{value} {word}'
 
 

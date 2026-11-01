@@ -32,6 +32,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse, reverse_lazy
 from requests.packages import target
 
+from templatetags.store_tags import end_sale_count
 from .forms import ReviewForm, ProductForm, RegisterForm, PriceFilterForm, DateFilterForm
 from .templatetags.store_tags import sale_count, products_count
 from .models import Product, Review, Category, Purchase
@@ -632,7 +633,7 @@ def sale(request):
     if request.method == 'POST':
         if 'end_sale' in request.POST:
             restored = Product.end_sale()
-            messages.success(request, f'Распродажа завершена и цены возвращены у {products_count(restored)}')
+            messages.success(request, f'Распродажа завершена и цены возвращены у {end_sale_count(restored)}')
             return redirect('main:index')
 
         try:
