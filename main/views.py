@@ -32,7 +32,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse, reverse_lazy
 from requests.packages import target
 
-from templatetags.store_tags import end_sale_count
+from .templatetags.store_tags import end_sale_count
 from .forms import ReviewForm, ProductForm, RegisterForm, PriceFilterForm, DateFilterForm
 from .templatetags.store_tags import sale_count, products_count
 from .models import Product, Review, Category, Purchase
