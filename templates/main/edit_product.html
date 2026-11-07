@@ -10,6 +10,27 @@
 
     <br>
 
+    {% if product.price_before_sale %}
+        <h2 style="text-align: center;
+        justify-content: center;
+        width: 680px;
+        display: flex;
+        color: red;
+        background-color: #CCFFFF;
+        margin: auto;
+        padding: 20px;
+        border-radius: 10px;">
+            Товар находится на распродаже. Цена до распродажи:
+            <br>
+            {{ product.price_before_sale }} $.
+            <br>
+            Изменение цены снимет товар с распродажи.
+        </h2>
+    {% endif %}
+
+    <br>
+    <br>
+
     <form method="post" action="{% url 'main:edit_product' product.id %}" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

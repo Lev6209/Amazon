@@ -1,0 +1,49 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Цены моих товаров - Amazon{% endblock %}
+
+{% block content %}
+    <h2>Цены моих товаров</h2>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% for form in formset %}
+            {{ form.id }}
+            
+            <h3>{{ form.instance.name }}</h3>
+
+            {% if form.instance.price_before_sale %}
+                <p style="color: red">
+                    Товар на распродаже, цена до нее {{ form.instance.price_before_sale }} $.
+                    Изменение цены снимет товар с распродажи.
+                </p>
+            {% endif %}
+
+            <div style="display: flex; align-items: center;">
+                <div>
+                    {{ form.price.label_tag }}
+                    {{ form.price }}
+                </div>
+
+                <div>
+                    {{ form.category.label_tag }}
+                    {{ form.category }}
+                </div>
+            </div>
+            <hr>
+        {% empty %}
+            <p>Выставленных вами товаров пока нет</p>
+        {% endfor %}
+
+        <br>
+        <button type="submit" style="width: 250px">Сохранить изменения</button>
+    </form>
+
+    <br>
+    <button type="button" onclick="window.location.href='{% url 'main:profile' %}'" style="width: 250px">
+        Вернутся к вашему профилю
+    </button>
+
+{% endblock %}

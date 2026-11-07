@@ -82,3 +82,17 @@ def end_sale_count(value):
     return f'{value} {word}'
 
 
+@register.filter
+def my_prices(value):
+    value = int(value)
+
+    if 11 <= value % 100 <= 14:
+        word = 'карт товаров'
+    elif value % 10 == 1:
+        word = 'карта товара'
+    elif 2 <= value % 10 <= 4:
+        word = 'карты товаров'
+    else:
+        word = 'карт товаров'
+
+    return f'{value} {word}'

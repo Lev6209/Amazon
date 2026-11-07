@@ -19,6 +19,12 @@
 
     <h2 style="text-align: center">Мои товары</h2>
 
+    <button type="button" onclick="window.location.href='{% url 'main:my_prices' %}'" style="width: 150px">
+        Изменить цены всех продуктов
+    </button>
+    <br>
+    <br>
+
     {% for product in products %}
         <li>
             {% if product.icon %}

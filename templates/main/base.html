@@ -17,46 +17,83 @@
 <div class="categories-nav">
     <nav>
         <a href="{% url 'main:index' %}"
-        class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Главная</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'index' %}
+            active{% endif %}">
+            Главная
+        </a>
+
         <a href="{% url 'main:about' %}"
-        class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">О магазине</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'about' %}
+            active{% endif %}">
+            О магазине
+        </a>
+
         <a href="{% url 'main:new' %}"
-        class="{% if request.resolver_match.url_name == 'new' %}active{% endif %}">Новинки</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'new' %}
+            active{% endif %}">
+            Новинки
+        </a>
+
         <a href="{% url 'main:review' %}"
-        class="{% if request.resolver_match.url_name == 'review' %}active{% endif %}">Отзывы покупателей</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'review' %}
+            active{% endif %}">
+            Отзывы покупателей
+        </a>
+
         <a href="{% url 'main:free_products' %}"
-        class="{% if request.resolver_match.url_name == 'free_products' %}active{% endif %}">Бесплатные товары</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'free_products' %}
+            active{% endif %}">
+            Бесплатные товары
+        </a>
+
         <a href="{% url 'main:paid_products' %}"
-        class="{% if request.resolver_match.url_name == 'paid_products' %}active{% endif %}">Платные товары</a>
-        &nbsp;
+            class="{% if request.resolver_match.url_name == 'paid_products' %}
+            active{% endif %}">
+            Платные товары
+        </a>
 
         {% if user.is_authenticated %}
             <a href="{% url 'main:add_product' %}"
-            class="{% if request.resolver_match.url_name == 'add_product' %}active{% endif %}">Разместить новый продукт</a>
-            &nbsp;
+                class="{% if request.resolver_match.url_name == 'add_product' %}
+                active{% endif %}">
+                Разместить новый продукт
+            </a>
+
             <a href="{% url 'main:favorites' %}"
-            class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">Избранное ({{ favorites_count }})</a>
-            &nbsp;
+                class="{% if request.resolver_match.url_name == 'favorites' %}
+                active{% endif %}">
+                Избранное ({{ favorites_count }})
+            </a>
+
             {% if user.is_staff %}
-                <a href="{% url 'main:sale' %}">Распродажа</a>
-                &nbsp;
+                <a href="{% url 'main:sale' %}"
+                    class="{% if request.resolver_match.url_name == 'sale' %}
+                    active{% endif %}">
+                    Распродажа
+                </a>
+
+                <a href="{% url 'main:edit_categories' %}"
+                    class="{% if request.resolver_match.url_name == 'edit_categories' %}
+                    active{% endif %}">
+                    Редактор категорий
+                </a>
             {% endif %}
 
             <a href="{% url 'main:purchases' %}"
-            class="{% if request.resolver_match.url_name == 'purchases' %}active{% endif %}">Мои покупки</a>
+                class="{% if request.resolver_match.url_name == 'purchases' %}
+                active{% endif %}">
+                Мои покупки
+            </a>
 
             <a href="{% url 'main:profile' %}"
-            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Профиль</a>
-            &nbsp;
-{#            <span>Приветствуем вас, <strong>{{ user.username }}</strong></span>#}
+                class="{% if request.resolver_match.url_name == 'profile' %}
+                active{% endif %}">
+                Профиль
+            </a>
+
             <form method="post" action="{% url 'main:logout' %}" style="display: inline;">
                 {% csrf_token %}
-                &nbsp;
+
                 <button type="submit" style="width: max-content; max-width: none;padding: 8px 8px; white-space: nowrap;">{{ user.username }} - Выйти</button>
             </form>
         {% else %}

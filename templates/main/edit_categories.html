@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Редактирование категорий{% endblock %}
+
+{% block content %}
+
+    <h2>Редактирование категорий</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% for form in formset %}
+            <div>
+                {{ form.id }}
+
+                {{ form.name.label_tag }}
+                {{ form.name }}
+
+                {{ form.name.errors }}
+                {{ form.non_field_errors }}
+            </div>
+            <br>
+        {% endfor %}
+
+        {{ formset.non_form_errors }}
+
+        <button type="submit" style="width: 200px; margin-left: 10%">Сохранить</button>
+    </form>
+
+{% endblock %}

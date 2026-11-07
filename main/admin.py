@@ -5,7 +5,10 @@ from .models import Seller, Category, Product, Review, Purchase
 admin.site.register(Seller)
 admin.site.register(Category)
 
-
+class ReviewInline(admin.TabularInline):
+    model = Review
+    fields = ('username', 'stars', 'comment', 'recommended')
+    extra = 0
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -13,6 +16,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    inlines = [ReviewInline]
     list_display = ('name', 'category', 'price', 'rating_avg', 'seller', 'author', 'created_at', 'rating_count')
     search_fields = ('name', 'description')
     list_filter = ('category', 'seller')

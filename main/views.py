@@ -4,6 +4,7 @@ import os
 import secrets
 
 from decimal import Decimal
+from django import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Sum, Count, Value
 from django.db.models.functions import Coalesce
@@ -29,10 +30,12 @@ from django.contrib.auth.views import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
+from django.forms import modelformset_factory
+
 from django.urls import reverse, reverse_lazy
 from requests.packages import target
 
-from .templatetags.store_tags import end_sale_count
+from .templatetags.store_tags import end_sale_count, my_prices
 from .forms import ReviewForm, ProductForm, RegisterForm, PriceFilterForm, DateFilterForm
 from .templatetags.store_tags import sale_count, products_count
 from .models import Product, Review, Category, Purchase
@@ -296,6 +299,8 @@ def add_review(request, product_id):
     })
 
 
+
+
 @require_GET
 def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -335,6 +340,60 @@ def category_detail(request, category_id):
         'products': products,
         'expensive': expensive,
         'form': form,
+    })
+
+
+CategoryFormSet = modelformset_factory(
+    Category,
+    fields=['name'],
+    labels={'name': 'Название категории'},
+    extra=0,
+    edit_only=True,
+)
+
+@login_required
+def edit_categories(request):
+
+    if not request.user.is_staff:
+        messages.error(
+            request,
+            'Редактировать категории может только персонал!'
+        )
+        return redirect('main:index')
+
+    categories = Category.objects.all().order_by('name')
+    count = 0
+
+    if request.method == 'POST':
+        formset = CategoryFormSet(
+            request.POST,
+            queryset=categories
+        )
+
+        if formset.is_valid():
+            saved = formset.save()
+
+            if len(saved) % 10 == 1 and len(saved) % 100 != 11:
+                word1 = 'Переименована'
+                word2 = 'категория'
+            elif len(saved) % 10 in (2, 3, 4) and len(saved) % 100 not in (12, 13, 14):
+                word1 = 'Переименовано'
+                word2 = 'категории'
+            else:
+                word1 = 'Переименовано'
+                word2 = 'категорий'
+
+            messages.success(
+                request,
+                f'{word1} {len(saved)} {word2}.'
+            )
+            return redirect('main:index')
+
+    else:
+        formset = CategoryFormSet(queryset=categories)
+
+    return render(request, 'main/edit_categories.html', {
+        'formset': formset
     })
 
 
@@ -471,29 +530,134 @@ def profile(request):
         'products': products
     })
 
+
+ProductPriceFormSet = modelformset_factory(
+    Product,
+    fields=['price', 'category'],
+    labels={'price': 'Цена', 'category': 'Категория'},
+    widgets={
+        'price': forms.NumberInput(attrs={
+            'style': 'width: 80px; '
+                     'font-size: 16px;'
+        }),
+        'category': forms.Select(attrs={
+            'style': 'width: 180px;'
+                     'height: 40px;'
+                     'border-radius: 5px;'
+                     'padding-left: 10px;'
+                     'font-size: 16px;'
+        })
+    },
+    extra=0,
+    edit_only=True,
+)
+
+@login_required()
+def my_prices(request):
+    products = Product.objects.filter(author=request.user).order_by('-name')
+    if request.method == 'POST':
+        formset = ProductPriceFormSet(request.POST, queryset=products)
+
+        if formset.is_valid():
+            removed_from_sale = 0
+
+            for form in formset:
+                if 'price' in form.changed_data:
+                    if form.instance.price_before_sale is not None:
+                        removed_from_sale += 1
+                    form.instance.price_before_sale = None
+            saved = formset.save()
+            count = len(saved)
+            if count % 10 == 1 and count % 100 != 11:
+                word1 = 'Изменена'
+                word2 = 'карточка товара'
+            elif count % 10 in (2, 3, 4) and count % 100 not in (12, 13, 14):
+                word1 = 'Изменено'
+                word2 = 'карточки товаров'
+            else:
+                word1 = 'Изменено'
+                word2 = 'карточек товаров'
+
+            if removed_from_sale == 0:
+                messages.success(request, f'{word1} {count} {word2}!')
+                return redirect('main:profile')
+
+            if removed_from_sale % 10 == 1 and removed_from_sale % 100 != 11:
+                word3 = 'снята'
+            else:
+                word3 = 'сняты'
+
+
+            messages.success(request, f'{word1} {count} {word2}, из них {removed_from_sale} {word3} с распродажи!')
+            return redirect('main:profile')
+    else:
+        formset = ProductPriceFormSet(queryset=products)
+    return render(request, 'main/my_prices.html', {'formset': formset})
+
 @login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
     if not (
-            request.user.has_perm('main.change_product')
-            or request.user.is_staff
-            or product.author_id == request.user.id
+        request.user.has_perm('main.change_product')
+        or request.user.is_staff
+        or product.author_id == request.user.id
     ):
-        messages.error(request, 'Редактировать карту продукта может только автор')
+        messages.error(
+            request,
+            'Редактировать карточку товара может только автор'
+        )
         return redirect(product.get_absolute_url())
 
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
+
         if form.is_valid():
-            form.save()
-            messages.success(request, f"Карта товара {product.name} обновлена успешно!")
+            changed_fields = [
+                str(form.fields[field].label)
+                for field in form.changed_data
+            ]
+
+            product = form.save(commit=False)
+
+            removed_from_sale = False
+
+            if 'price' in form.changed_data:
+                if product.price_before_sale is not None:
+                    removed_from_sale = True
+                    product.price_before_sale = None
+
+            product.save()
+
+            if changed_fields:
+                fields_names = ', '.join(changed_fields)
+                if removed_from_sale:
+                    messages.success(
+                        request,
+                        f'В карточке товара "{product.name}" изменена {fields_names.lower()} и товар снят с распродажи'
+                    )
+
+                else:
+                    messages.success(
+                        request,
+                        f'В карточке товара "{product.name}" изменено: {fields_names}'
+                )
+            else:
+                messages.info(
+                    request,
+                    'Вы ничего не изменили'
+                )
+
             return redirect(product.get_absolute_url())
+
     else:
         form = ProductForm(instance=product)
+
     return render(request, 'main/edit_product.html', {
         'form': form,
         'product': product
     })
+
 
 @login_required
 @require_POST

@@ -20,6 +20,7 @@ urlpatterns = [
     path('product/<int:product_id>/buy/', views.buy_product, name='buy_product'),
     path('purchases/', views.purchases, name='purchases'),
 
+    path('categories/edit/', views.edit_categories, name='edit_categories'),
 
     path('product/<int:product_id>/<path:product_name>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
@@ -37,6 +38,7 @@ urlpatterns = [
     path('logout/', views.StoreLogoutView.as_view(), name='logout'),
 
     path('profile/', views.profile, name='profile'),
+    path('profile/prices', views.my_prices, name='my_prices'),
     path('author/<int:user_id>/', views.author_detail, name='author_detail'),
 
     path('password-reset/', views.StorePasswordResetView.as_view(), name='password_reset'),
