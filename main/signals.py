@@ -5,8 +5,10 @@ from django.db.models import Avg, Count
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.mail import send_mail
+from django.core.cache import cache
 
-from .models import Product, Review
+from .models import Product, Review, Category
+
 
 def refresh_product_rating(product_id):
     stats = Review.objects.filter(product_id=product_id).aggregate(
@@ -55,3 +57,10 @@ def review_saved(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Review, dispatch_uid='main.review_deleted_refresh_rating')
 def review_deleted(sender, instance, **kwargs):
     refresh_product_rating(instance.product_id)
+
+
+@receiver([post_save, post_delete], sender=Product)
+@receiver([post_save, post_delete], sender=Category)
+@receiver([post_save, post_delete], sender=Review)
+def clear_store_cache(sender, **kwargs):
+    cache.clear()

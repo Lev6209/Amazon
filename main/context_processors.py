@@ -1,15 +1,26 @@
 from django.db.models import Count
+from django.core.cache import cache
 
 from .models import Product, Category
 
 
 
 def store_menu(request):
-    categories = list(
-        Category.objects
-        .annotate(product_count=Count('product'))
-        .order_by('name')
-    )
+    categories = cache.get('menu_categories')
+
+    if categories is None:
+        categories = list(
+            Category.objects
+            .annotate(product_count=Count('product'))
+            .order_by('name')
+        )
+        cache.set('menu_categories', categories, 60 * 3)
+
+    products_total = cache.get('apps_total')
+
+    if products_total is None:
+        products_total = Product.objects.count()
+        cache.set('products_total', products_total, 60 * 10)
 
     favorites_count = 0
     if request.user.is_authenticated:

@@ -11,13 +11,14 @@
 
         {% for form in formset %}
             {{ form.id }}
-            
+
             <h3>{{ form.instance.name }}</h3>
 
             {% if form.instance.price_before_sale %}
                 <p style="color: red">
                     Товар на распродаже, цена до нее {{ form.instance.price_before_sale }} $.
                     Изменение цены снимет товар с распродажи.
+                    Изменение категории на распродажу не повлияет.
                 </p>
             {% endif %}
 

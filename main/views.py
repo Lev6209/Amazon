@@ -4,15 +4,24 @@ import os
 import secrets
 
 from decimal import Decimal
+
 from django import forms
 from django.shortcuts import render, get_object_or_404, redirect
+
 from django.db.models import Q, Sum, Count, Value
 from django.db.models.functions import Coalesce
+
 from django.core.paginator import Paginator
+
 from django.views.decorators.http import require_GET, require_POST
-from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
+
 from django.conf import settings
+from django.http import JsonResponse
+
+from django.utils.decorators import method_decorator
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -99,6 +108,8 @@ SORTS = {
 #         'categories': categories,
 #     })
 
+@method_decorator(cache_page(60), name='dispatch')
+@method_decorator(vary_on_cookie, name='dispatch')
 class IndexView(ListView):
     model = Product
     template_name = 'main/index.html'
@@ -300,7 +311,8 @@ def add_review(request, product_id):
 
 
 
-
+@cache_page(60 * 2)
+@vary_on_cookie
 @require_GET
 def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -429,6 +441,7 @@ class NewProductView(ListView):
     def get_queryset(self):
         return Product.objects.newest().defer('description')
 
+@cache_page(60 * 5)
 @require_GET
 def api_product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
